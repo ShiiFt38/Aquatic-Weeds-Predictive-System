@@ -89,8 +89,8 @@ def detect_and_analyze_vegetation(image):
     return image, vegetation_data
 
 
-# Insert appropriate image path 
-input_image = "Photos/hartbeespoort_dam_2021-10-23.tif"
+# Insert absolute image path when running into errors
+input_image = "Assets/Images/hartbeespoort_dam_2021-04-01.tif"
 original_image = cv2.imread(input_image)
 enhanced_image = enhance_green_vegetation(input_image)
 
