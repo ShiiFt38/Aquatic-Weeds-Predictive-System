@@ -1,8 +1,7 @@
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from views.ui import Interface
 
-class Dashboard(QWidget):
+class Prediction(QWidget):
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
@@ -13,7 +12,7 @@ class Dashboard(QWidget):
         sidebar = ui.create_sidebar()
         header = ui.create_header()
 
-        lbl_welcome = QLabel("Welcome to your Dashboard")
+        lbl_title = QLabel("Predictions")
 
         # Layout
         content_widget = QWidget()
@@ -29,7 +28,7 @@ class Dashboard(QWidget):
         inner_layout.addWidget(content_area, 1)
 
         # Content layout
-        content_layout.addWidget(lbl_welcome)
+        content_layout.addWidget(lbl_title)
         content_widget.setLayout(content_layout)
         content_area.setWidget(content_widget)
         content_area.setWidgetResizable(True)
@@ -40,4 +39,5 @@ class Dashboard(QWidget):
         self.setLayout(main_layout)
 
         # Design
-        lbl_welcome.setStyleSheet("font-size: 24px; font-weight: bold; margin: 20px 0;")
+        lbl_title.setStyleSheet("font-size: 24px; font-weight: bold; margin: 20px 0;")
+
