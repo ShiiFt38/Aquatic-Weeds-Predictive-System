@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QPalette, QBrush, QPainter
+from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from views.ui import Interface
 
 class Login(QWidget):
@@ -9,7 +9,7 @@ class Login(QWidget):
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
-        self.setFixedSize(900, 600)
+        self.setMinimumSize(900, 450)
         self.setWindowTitle("Login - Aquatic Weeds Predictive System")
 
         ui = Interface(self.stack)
@@ -33,9 +33,8 @@ class Login(QWidget):
 
         main_layout.addWidget(logo, alignment=Qt.AlignCenter)
         main_layout.addWidget(lbl_title, alignment=Qt.AlignCenter)
-        main_layout.addSpacing(20)
+        main_layout.addStretch()
 
-        form_layout.addSpacing(20)
         form_layout.addWidget(self.txt_email, alignment=Qt.AlignCenter)
         form_layout.addSpacing(20)
         form_layout.addWidget(self.txt_password, alignment=Qt.AlignCenter)
@@ -43,7 +42,7 @@ class Login(QWidget):
         form_layout.addSpacing(30)
         form_layout.addWidget(btn_login, alignment=Qt.AlignCenter)
         form_layout.addWidget(lbl_signup, alignment=Qt.AlignCenter)
-        form_layout.addSpacing(20)
+        form_layout.addStretch()
 
         main_layout.addLayout(form_layout)
         self.setLayout(main_layout)
@@ -57,8 +56,44 @@ class Login(QWidget):
         self.txt_email.setFixedSize(200, 30)
         self.txt_password.setFixedSize(200, 30)
 
+        self.setAutoFillBackground(True)
+        self.home_palette = self.palette()
+        self.background_image = QPixmap("Assets/Images/Leaf_bg.png")
+        self.update_background(self)
+
         # Functions
         btn_login.clicked.connect(self.handle_login)
+
+    def update_background(self, view):
+        # Calculate the centered rectangle for the background image
+        view_rect = view.rect()
+        image_rect = self.background_image.rect()
+
+        centered_rect = QRect(
+            view_rect.center().x() - image_rect.width() // 2,
+            view_rect.center().y() - image_rect.height() // 2,
+            image_rect.width(),
+            image_rect.height()
+        )
+
+        # Create a new pixmap with the size of the view
+        centered_pixmap = QPixmap(view_rect.size())
+        centered_pixmap.fill(Qt.transparent)
+
+         # Paint the background image onto the new pixmap at the calculated position
+        painter = QPainter(centered_pixmap)
+        painter.drawPixmap(centered_rect, self.background_image)
+        painter.end()
+
+        # Set the centered pixmap as the background
+        self.home_palette.setBrush(QPalette.Window, QBrush(centered_pixmap))
+        view.setPalette(self.home_palette)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        # Update background image when window is resized
+        home_view = self.stack.widget(0)
+        self.update_background(home_view)
 
     def handle_login(self):
         self.login_successful.emit()

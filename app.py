@@ -8,13 +8,13 @@ from views.data_win import Data
 from views.help_win import Help
 from views.about_win import About
 
+
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(600, 600)
+        self.resize(600, 450)
         self.setWindowTitle("Aquatic Weeds Predictive System")
         self.setWindowIcon(QIcon("Assets/Images/Logo.png"))
-
 
         self.stack = QStackedWidget()
 
@@ -42,7 +42,6 @@ class App(QWidget):
 
     def switch_to_dashboard(self):
         self.stack.setCurrentWidget(self.dashboard_widget)
-
 
 
 if __name__ == "__main__":
