@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from views.login_win import Login
 from views.dashboard_win import Dashboard
@@ -7,16 +7,17 @@ from views.reports_win import Report
 from views.data_win import Data
 from views.help_win import Help
 from views.about_win import About
+from views.settings_win import Settings
 
 
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(600, 450)
+        self.setMinimumSize(1100, 450)
         self.setWindowTitle("Aquatic Weeds Predictive System")
         self.setWindowIcon(QIcon("Assets/Images/Logo.png"))
 
-        self.stack = QStackedWidget()
+        self.stack = QStackedWidget(self)
 
         self.login_widget = Login(self.stack)
         self.dashboard_widget = Dashboard(self.stack)
@@ -25,6 +26,7 @@ class App(QWidget):
         self.data = Data(self.stack)
         self.help = Help(self.stack)
         self.about = About(self.stack)
+        self.settings = Settings(self.stack)
 
         self.stack.addWidget(self.login_widget)
         self.stack.addWidget(self.dashboard_widget)
@@ -33,6 +35,7 @@ class App(QWidget):
         self.stack.addWidget(self.data)
         self.stack.addWidget(self.help)
         self.stack.addWidget(self.about)
+        self.stack.addWidget(self.settings)
 
         layout = QVBoxLayout()
         layout.addWidget(self.stack)

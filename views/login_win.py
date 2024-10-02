@@ -9,7 +9,6 @@ class Login(QWidget):
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
-        self.setMinimumSize(900, 450)
         self.setWindowTitle("Login - Aquatic Weeds Predictive System")
 
         ui = Interface(self.stack)
@@ -50,11 +49,11 @@ class Login(QWidget):
         # Design
         lbl_title.setStyleSheet(" color: black; margin-inline: auto;font-weight: bold;")
 
-        lbl_title.setFont(QFont('Arial', 24))
-        lbl_signup.setFont(QFont('Arial', 8))
+        lbl_title.setFont(QFont('Helvetica', 24))
+        lbl_signup.setFont(QFont('Helvetica', 8))
 
-        self.txt_email.setFixedSize(200, 30)
-        self.txt_password.setFixedSize(200, 30)
+        self.txt_email.setFixedSize(250, 30)
+        self.txt_password.setFixedSize(250, 30)
 
         self.setAutoFillBackground(True)
         self.home_palette = self.palette()

@@ -1,3 +1,5 @@
+from reprlib import aRepr
+
 from PyQt5.QtWidgets import *
 from views.ui import Interface
 
@@ -40,4 +42,5 @@ class Data(QWidget):
 
         # Design
         lbl_title.setStyleSheet("font-size: 24px; font-weight: bold; margin: 20px 0;")
+        content_area.setStyleSheet("border: none")
 
