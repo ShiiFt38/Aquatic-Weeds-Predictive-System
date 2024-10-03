@@ -22,13 +22,17 @@ class Prediction(QWidget):
 
         lbl_summary = ui.create_heading("Summary")
 
-        btn_original = ui.create_primary_btn("Original")
-        btn_enhanced = ui.create_primary_btn("Enhanced")
-        btn_detected = ui.create_primary_btn("Detected")
+        btn_original = ui.create_tertiary_btn("Original")
+        btn_enhanced = ui.create_tertiary_btn("Enhanced")
+        btn_detected = ui.create_tertiary_btn("Detected")
 
         lbl_upload_title = ui.create_heading("Upload Image")
         global lbl_upload_image
         lbl_upload_image = QLabel("Image Display")
+        pixmap = QPixmap("Assets/Images/undraw_Going_up_re_86kg.png")
+        scaled_pixmap = pixmap.scaled(132, 132, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        lbl_upload_image.setPixmap(scaled_pixmap)
+        lbl_upload_image.setAlignment(Qt.AlignCenter)
         btn_upload = ui.create_primary_btn("Upload")
 
         lbl_prediction_title = ui.create_heading("Prediction")

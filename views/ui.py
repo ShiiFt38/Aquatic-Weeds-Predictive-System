@@ -8,32 +8,41 @@ class Interface():
         self.stack = stack
         self.styles = {
             "primary_btn": """QPushButton {
-                                    background-color: #00710D; 
+                                    background-color: #000000; 
                                     color: #ffffff; 
                                     font-family: Helvetica;
                                     font-size: 12px; 
                                     font-weight: bold;
                                     border-radius: 10px;
-                                    cursor: pointer;
-                                    transition: background-color 0.3s ease, transform 0.3s ease;}
-                                    
-                                    QPushButton:hover{
-                                    background-color: #C1FACA;
-                                    color: #00710D;
-                                    }""",
-            "secondary_btn": """QPushButton {
-                                    color: #000000; 
-                                    font-size: 12px; 
-                                    font-weight: bold;
-                                    border-radius: 10px;
-                                    cursor: pointer;
-                                    transition: background-color 0.3s ease, transform 0.3s ease;
                                     }
                                     
                                     QPushButton:hover{
                                     background-color: #C1FACA;
-                                    color: #00710D;
+                                    color: #000000;
                                     }""",
+            "secondary_btn": """QPushButton {
+                                    color: #ffffff; 
+                                    font-size: 12px; 
+                                    font-weight: bold;
+                                    border-radius: 10px;
+                                    }
+                                    
+                                    QPushButton:hover{
+                                    background-color: #C1FACA;
+                                    color: #000000;
+                                    }""",
+            "tertiary_btn": """QPushButton {
+                                            background-color: #000000;
+                                            color: #ffffff; 
+                                            font-size: 12px; 
+                                            font-weight: bold;
+                                            border-radius: 10px;
+                                            }
+
+                                            QPushButton:hover{
+                                            background-color: #C1FACA;
+                                            color: #000000;
+                                            }""",
             "title_style": """ QLabel {
                                     font-size: 24px; 
                                     font-weight: bold; 
@@ -61,6 +70,14 @@ class Interface():
 
         return button
 
+    def create_tertiary_btn(self, text):
+        button = QPushButton(text)
+        button.setStyleSheet(self.styles["tertiary_btn"])
+        button.setFixedSize(160, 25)
+        button.setFont(QFont('Helvetica', 12))
+
+        return button
+
     def create_title(self, text):
         lbl_title = QLabel(text)
         lbl_title.setStyleSheet(self.styles["title_style"])
@@ -79,6 +96,7 @@ class Interface():
         sidebar_widget = QWidget()
         sidebar_widget.setFixedWidth(180)
         user_widget = QWidget()
+        user_widget.setStyleSheet("background-color: #6D31ED; border-radius: 10px;")
 
         sidebar_layout = QVBoxLayout(sidebar_widget)
         user_layout = QHBoxLayout(user_widget)
@@ -104,12 +122,14 @@ class Interface():
         sidebar_layout.addWidget(btn_about)
         sidebar_layout.addStretch()
 
+        sidebar_widget.setStyleSheet("background-color: #00710D; border-radius: 10px")
+
         # Side menu > User profile contents
         user_layout.addWidget(user_avatar)
         user_info.addWidget(self.create_heading("John Doe"), alignment=Qt.AlignCenter)
         user_info.addWidget(QLabel("View Profile"), alignment=Qt.AlignCenter)
         user_layout.addLayout(user_info)
-        sidebar_layout.addWidget(user_widget)
+        # sidebar_layout.addWidget(user_widget)
 
         btn_dashboard.clicked.connect(lambda: self.stack.setCurrentIndex(1))
         btn_predictions.clicked.connect(lambda: self.stack.setCurrentIndex(2))
@@ -122,7 +142,7 @@ class Interface():
 
     def create_header(self):
         lbl_name = QLabel("AWPS")
-        lbl_name.setStyleSheet("font-size: 24px; font-weight: bold; color: #6D31ED; margin-bottom: 24px")
+        lbl_name.setStyleSheet("font-size: 24px; font-weight: bold; color: #000000; margin-bottom: 24px")
         lbl_name.setAlignment(Qt.AlignCenter)
 
         header_widget = QWidget()
@@ -157,7 +177,7 @@ class Interface():
         lbl_image = QLabel("")
         lbl_image.setPixmap(QPixmap(image_path).scaled(132, 132, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         layout.addWidget(lbl_image, alignment=Qt.AlignCenter)
-        btn = self.create_primary_btn(button_text)
+        btn = self.create_tertiary_btn(button_text)
         layout.addWidget(btn, alignment=Qt.AlignCenter)
 
         if button_action != None:

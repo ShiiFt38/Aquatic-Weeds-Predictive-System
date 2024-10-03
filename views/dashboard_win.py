@@ -91,7 +91,7 @@ class Dashboard(QWidget):
     def create_new_prediction(self):
         return self.ui.create_card_widget("New Prediction",
                                        "Enhance image quality with advanced AI. ",
-                                       "New", "Assets/Images/Scanned Image.png", lambda: self.stack.setCurrentIndex(2))
+                                       "New", "Assets/Images/undraw_Predictive_analytics_re_wxt8.png", lambda: self.stack.setCurrentIndex(2))
 
     def create_current_prediction(self):
         widget = QWidget()
@@ -126,16 +126,16 @@ class Dashboard(QWidget):
     def create_compare_predictions(self):
         return self.ui.create_card_widget("Compare Predictions",
                                        "Determine the progress of the plant's movement",
-                                       "Compare", "Assets/Images/Scanned Image.png")
+                                       "Compare", "Assets/Images/undraw_split_testing_l1uw.png")
 
     def create_recent_predictions(self):
         return self.ui.create_card_widget("Recent Predictions",
                                        "Look back at previous forecasting",
-                                       "View", "Assets/Images/Scanned Image.png")
+                                       "View", "Assets/Images/undraw_Booking_re_gw4j.png")
 
     def create_reports(self):
         return self.ui.create_card_widget("Reports",
                                        "Customise, edit and export valuable insights from reports",
-                                       "Generate", "Assets/Images/Scanned Image.png")
+                                       "Generate", "Assets/Images/undraw_Done_checking_re_6vyx.png")
 
 
