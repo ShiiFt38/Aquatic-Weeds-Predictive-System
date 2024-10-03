@@ -1,4 +1,3 @@
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from views.ui import Interface
@@ -92,7 +91,7 @@ class Dashboard(QWidget):
     def create_new_prediction(self):
         return self.ui.create_card_widget("New Prediction",
                                        "Enhance image quality with advanced AI. ",
-                                       "New", "Assets/Images/Scanned Image.png")
+                                       "New", "Assets/Images/Scanned Image.png", lambda: self.stack.setCurrentIndex(2))
 
     def create_current_prediction(self):
         widget = QWidget()

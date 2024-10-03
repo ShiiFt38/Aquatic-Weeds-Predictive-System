@@ -22,28 +22,36 @@ class Login(QWidget):
         self.txt_email.setPlaceholderText('Email')
         self.txt_password = QLineEdit()
         self.txt_password.setPlaceholderText("Password")
-        forgot_password = QLabel("Forgot password?")
+        lbl_email = QLabel("Email")
+        lbl_password = QLabel("Password")
+        lbl_forgot_password = QLabel("Forgot password?")
         btn_login = ui.create_primary_btn("Login")
         lbl_signup = QLabel("Don't have an account? Sign up")
 
         # Layout
+        form_widget = QWidget()
+
         main_layout = QVBoxLayout()
-        form_layout = QVBoxLayout()
+        form_layout = QVBoxLayout(form_widget)
 
         main_layout.addWidget(logo, alignment=Qt.AlignCenter)
         main_layout.addWidget(lbl_title, alignment=Qt.AlignCenter)
         main_layout.addStretch()
 
+        form_layout.addWidget(lbl_email)
         form_layout.addWidget(self.txt_email, alignment=Qt.AlignCenter)
         form_layout.addSpacing(20)
+        form_layout.addWidget(lbl_password)
         form_layout.addWidget(self.txt_password, alignment=Qt.AlignCenter)
-        form_layout.addWidget(forgot_password, alignment=Qt.AlignCenter)
+        form_layout.addWidget(lbl_forgot_password, alignment=Qt.AlignCenter)
         form_layout.addSpacing(30)
         form_layout.addWidget(btn_login, alignment=Qt.AlignCenter)
         form_layout.addWidget(lbl_signup, alignment=Qt.AlignCenter)
         form_layout.addStretch()
+        form_widget.setLayout(form_layout)
 
-        main_layout.addLayout(form_layout)
+        main_layout.addWidget(form_widget, alignment=Qt.AlignCenter)
+        main_layout.addStretch()
         self.setLayout(main_layout)
 
         # Design
@@ -52,13 +60,39 @@ class Login(QWidget):
         lbl_title.setFont(QFont('Helvetica', 24))
         lbl_signup.setFont(QFont('Helvetica', 8))
 
+        lineedit_styles = """
+            QLineEdit {
+                background-color: white;
+                color: white;
+                padding: 5px;
+                border: 2px solid green;
+                border-radius: 10px;
+            }
+            QLineEdit::placeholder {
+                color: black;
+            }
+        """
+
+        self.txt_email.setStyleSheet(lineedit_styles)
+        self.txt_password.setStyleSheet(lineedit_styles)
         self.txt_email.setFixedSize(250, 30)
         self.txt_password.setFixedSize(250, 30)
+
+        label_styles = "background: transparent; color: white; font-weight: bold;"
+        lbl_email.setStyleSheet(label_styles)
+        lbl_email.setFont(QFont("Helvetica"))
+        lbl_password.setStyleSheet(label_styles)
+        lbl_email.setFont(QFont("Helvetica"))
+        lbl_forgot_password.setStyleSheet(label_styles)
+        lbl_signup.setStyleSheet(label_styles)
 
         self.setAutoFillBackground(True)
         self.home_palette = self.palette()
         self.background_image = QPixmap("Assets/Images/Leaf_bg.png")
         self.update_background(self)
+
+        form_widget.setStyleSheet("background-color: rgba(0, 0, 0, 128); border-radius: 10px;")
+        form_widget.setContentsMargins(100, 40, 100, 60)
 
         # Functions
         btn_login.clicked.connect(self.handle_login)

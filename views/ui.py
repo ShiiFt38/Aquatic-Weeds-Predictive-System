@@ -106,7 +106,7 @@ class Interface():
 
         # Side menu > User profile contents
         user_layout.addWidget(user_avatar)
-        user_info.addWidget(QLabel("John Doe"), alignment=Qt.AlignCenter)
+        user_info.addWidget(self.create_heading("John Doe"), alignment=Qt.AlignCenter)
         user_info.addWidget(QLabel("View Profile"), alignment=Qt.AlignCenter)
         user_layout.addLayout(user_info)
         sidebar_layout.addWidget(user_widget)
@@ -143,21 +143,24 @@ class Interface():
 
         return header_widget
 
-    def create_card_widget(self, title, description, button_text, image_path):
+    def create_card_widget(self, title, description, button_text, image_path, button_action = None):
         widget = QWidget()
         widget.setMinimumSize(250, 250)
         widget.setStyleSheet("background-color: #E2E2E2; border-radius: 10px;")
         layout = QVBoxLayout(widget)
+        layout.setSpacing(5)
         lbl_heading = self.create_heading(title)
         layout.addWidget(lbl_heading)
-        layout.addSpacing(5)
         lbl_description = QLabel(description)
         lbl_description.setFont(QFont("Helvetica", 8))
         layout.addWidget(lbl_description)
         lbl_image = QLabel("")
         lbl_image.setPixmap(QPixmap(image_path).scaled(132, 132, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         layout.addWidget(lbl_image, alignment=Qt.AlignCenter)
-        layout.addSpacing(5)
         btn = self.create_primary_btn(button_text)
         layout.addWidget(btn, alignment=Qt.AlignCenter)
+
+        if button_action != None:
+            btn.clicked.connect(button_action)
+
         return widget

@@ -13,7 +13,7 @@ from views.settings_win import Settings
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(1100, 450)
+        self.setMinimumSize(1100, 750)
         self.setWindowTitle("Aquatic Weeds Predictive System")
         self.setWindowIcon(QIcon("Assets/Images/Logo.png"))
 
