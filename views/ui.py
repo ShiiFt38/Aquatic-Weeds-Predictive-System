@@ -46,7 +46,6 @@ class Interface():
             "title_style": """ QLabel {
                                     font-size: 24px; 
                                     font-weight: bold; 
-                                    margin: 20px 0;
                                     }""",
             "heading_style": """ QLabel {
                                     font-size: 12px; 
@@ -142,7 +141,7 @@ class Interface():
 
     def create_header(self):
         lbl_name = QLabel("AWPS")
-        lbl_name.setStyleSheet("font-size: 24px; font-weight: bold; color: #000000; margin-bottom: 24px")
+        lbl_name.setStyleSheet("font-size: 24px; font-weight: bold; color: #000000;")
         lbl_name.setAlignment(Qt.AlignCenter)
 
         header_widget = QWidget()
@@ -164,19 +163,30 @@ class Interface():
         return header_widget
 
     def create_card_widget(self, title, description, button_text, image_path, button_action = None):
-        widget = QWidget()
+        widget = QGroupBox(title)
         widget.setMinimumSize(250, 250)
-        widget.setStyleSheet("background-color: #E2E2E2; border-radius: 10px;")
+        widget.setStyleSheet("""
+            QGroupBox {
+                padding: 20px 20px 20px 10px;
+                border: 1px solid black;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                padding: 0 10px;
+                }
+        """)
         layout = QVBoxLayout(widget)
-        layout.setSpacing(5)
-        lbl_heading = self.create_heading(title)
-        layout.addWidget(lbl_heading)
         lbl_description = QLabel(description)
         lbl_description.setFont(QFont("Helvetica", 8))
-        layout.addWidget(lbl_description)
+        layout.addWidget(lbl_description, alignment=Qt.AlignCenter)
         lbl_image = QLabel("")
-        lbl_image.setPixmap(QPixmap(image_path).scaled(132, 132, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        lbl_image.setPixmap(QPixmap(image_path).scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         layout.addWidget(lbl_image, alignment=Qt.AlignCenter)
+        layout.addSpacing(5)
         btn = self.create_tertiary_btn(button_text)
         layout.addWidget(btn, alignment=Qt.AlignCenter)
 

@@ -10,7 +10,7 @@ class About(QWidget):
         ui = Interface(self.stack)
 
         lbl_awps = ui.create_title("Aquatic Weeds Predictive System")
-        lbl_version = QLabel("Version 1.0.0")
+        lbl_version = QLabel("Version 0.5.0")
         btn_close = ui.create_primary_btn("Close")
 
         #Layout

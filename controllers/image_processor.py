@@ -7,15 +7,6 @@ class ImageProcessor():
         self.input_image = input_image
         self.original_image = cv2.imread(self.input_image)
 
-        # Insert absolute image path when running into errors
-        """
-        input_image = "Assets/Images/hartbeespoort_dam_2021-04-01.tif"
-        original_image = cv2.imread(input_image)
-        enhanced_image = self.enhance_green_vegetation(input_image)
-
-        result_image, veg_data = self.detect_and_analyze_vegetation(enhanced_image)
-        """
-
     def enhance_green_vegetation(self, output_path=None):
         # Load the image
         img = cv2.imread(self.input_image)

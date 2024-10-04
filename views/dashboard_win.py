@@ -94,13 +94,24 @@ class Dashboard(QWidget):
                                        "New", "Assets/Images/undraw_Predictive_analytics_re_wxt8.png", lambda: self.stack.setCurrentIndex(2))
 
     def create_current_prediction(self):
-        widget = QWidget()
-        widget.setStyleSheet("background-color: #E2E2E2; border-radius: 10px;")
+        widget = QGroupBox("Current Prediction")
+        widget.setStyleSheet("""
+            QGroupBox {
+                padding: 20px 20px 20px 10px;
+                border: 1px solid black;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                }
+        """)
         widget.setMaximumSize(1500, 400)
         layout = QVBoxLayout(widget)
-        lbl_heading = self.ui.create_heading("Current Prediction")
-        layout.addWidget(lbl_heading)
-        layout.addWidget(QLabel("Overview of current prediction data"))
+        lbl_description = (QLabel("Overview of current prediction data"))
+        layout.addWidget(lbl_description, alignment = Qt.AlignCenter )
 
         stats_layout = QHBoxLayout()
         stats_layout.setSpacing(40)
