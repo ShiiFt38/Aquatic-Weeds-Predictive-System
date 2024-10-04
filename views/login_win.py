@@ -55,7 +55,7 @@ class Login(QWidget):
         self.setLayout(main_layout)
 
         # Design
-        lbl_title.setStyleSheet(" color: black; margin-inline: auto;font-weight: bold;")
+        lbl_title.setStyleSheet(" color: black; font-weight: bold;")
 
         lbl_title.setFont(QFont('Helvetica', 24))
         lbl_signup.setFont(QFont('Helvetica', 8))
@@ -65,7 +65,6 @@ class Login(QWidget):
                 background-color: white;
                 color: white;
                 padding: 5px;
-                border: 2px solid green;
                 border-radius: 10px;
             }
             QLineEdit::placeholder {
