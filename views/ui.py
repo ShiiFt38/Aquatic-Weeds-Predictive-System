@@ -50,7 +50,21 @@ class Interface():
             "heading_style": """ QLabel {
                                     font-size: 12px; 
                                     font-weight: bold; 
-                                    }"""
+                                    }""",
+            "section_style": """
+            QGroupBox {
+                padding: 50px 50px 50px 50px;
+                border: 1px solid black;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                padding: 0 10px;
+                }
+        """
         }
 
     def create_primary_btn(self, text):
@@ -130,6 +144,7 @@ class Interface():
         user_layout.addLayout(user_info)
         # sidebar_layout.addWidget(user_widget)
 
+        # Lambda functions - anonymous functions
         btn_dashboard.clicked.connect(lambda: self.stack.setCurrentIndex(1))
         btn_predictions.clicked.connect(lambda: self.stack.setCurrentIndex(2))
         btn_reports.clicked.connect(lambda: self.stack.setCurrentIndex(3))
@@ -149,7 +164,7 @@ class Interface():
         header_layout = QHBoxLayout(header_widget)
 
         btn_settings = self.create_primary_btn("Settings")
-        btn_logout = self.create_primary_btn("Log Out")
+        btn_logout = self.create_primary_btn("Exit")
 
         header_layout.addSpacing(50)
         header_layout.addWidget(lbl_name)

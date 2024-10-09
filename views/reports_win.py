@@ -58,19 +58,7 @@ class Report(QWidget):
     def create_report_section(self, title):
         section = QGroupBox(title)
         layout = QHBoxLayout(section)
-        section.setStyleSheet("""
-            QGroupBox {
-                padding: 50px 50px 50px 50px;
-                border: 1px solid black;
-                border-radius: 10px;
-                font-weight: bold;
-                font-size: 12px;
-            }
-            
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                }
-        """)
+        section.setStyleSheet(self.ui.styles["section_style"])
         layout.addSpacing(20)
 
         lbl_choose = self.ui.create_heading("Choose date range")

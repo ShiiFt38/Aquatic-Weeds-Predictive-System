@@ -106,6 +106,7 @@ class Dashboard(QWidget):
             
             QGroupBox::title {
                 subcontrol-origin: margin;
+                padding: 0 10px;
                 }
         """)
         widget.setMaximumSize(1500, 400)

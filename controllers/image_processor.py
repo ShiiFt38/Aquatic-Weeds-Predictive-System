@@ -92,16 +92,4 @@ class ImageProcessor():
                 cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
         return image, vegetation_data
 
-        # Display results
-        cv2.imshow('Original Image', original_image)
-        cv2.imshow('Vegetation Analysis', result_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
-        # Print vegetation data
-        for veg in veg_data:
-            print(f"Vegetation patch {veg['id']}:")
-            print(f"  Area: {veg['area']} pixels")
-            print(f"  Bounding box: {veg['bounding_box']}")
-            print(f"  Centroid: {veg['centroid']}")
-            print()
