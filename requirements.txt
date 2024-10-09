@@ -1,0 +1,5 @@
+PyQt5==5.15.9
+earthengine-api==0.1.342
+geemap==0.22.1
+python-dotenv==1.0.0
+opencv-python==4.7.0.72
