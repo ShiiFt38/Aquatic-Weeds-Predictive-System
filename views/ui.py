@@ -67,6 +67,64 @@ class Interface():
         """
         }
 
+        self.calendar_styles = """
+                            QCalendarWidget QToolButton {
+                                background-color: #6D31ED;
+                                color: #E2E2E2;
+                                font-size: 16px;
+                                height: 30px;
+                                width: 100px;
+                                icon-size: 20px;
+                                font-weight: bold;
+                            }
+                            QCalendarWidget QToolButton:hover {
+                                background-color: #C1FACA;
+                                color: #000000;
+                            }
+                            QCalendarWidget QToolButton:pressed {
+                                background-color: #FFBBAA;
+                            }
+                            QCalendarWidget QMenu {
+                                background-color: #333;
+                                color: #FFF;
+                            }
+                            QCalendarWidget QSpinBox {
+                                width: 100px;
+                                font-size: 14px;
+                            }
+                            QCalendarWidget QSpinBox::up-button {
+                                subcontrol-origin: border;
+                                subcontrol-position: top right;
+                                width: 30px;
+                            }
+                            QCalendarWidget QSpinBox::down-button {
+                                subcontrol-origin: border;
+                                subcontrol-position: bottom right;
+                                width: 30px;
+                            }
+                            QCalendarWidget QWidget#qt_calendar_navigationbar { /* Navigation bar */
+                                background-color: #6D31ED;
+                            }
+                            QCalendarWidget QAbstractItemView:enabled {
+                                font-size: 16px;
+                                color: #333;
+                                background-color: #FFF;
+                                selection-background-color: #FFDDC1;
+                                selection-color: black;
+                            }
+                            QCalendarWidget QAbstractItemView:disabled {
+                                color: #999;
+                            }
+                            QCalendarWidget QAbstractItemView:selected {
+                                background-color: #FFA07A;
+                                color: white;
+                            }
+                            QCalendarWidget QAbstractItemView:hover {
+                                background-color: #FFDDC1;
+                                color: #333;
+                            }
+                        """
+
     def create_primary_btn(self, text):
         button = QPushButton(text)
         button.setStyleSheet(self.styles["primary_btn"])
