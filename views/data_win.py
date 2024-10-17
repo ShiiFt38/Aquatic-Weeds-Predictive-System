@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, Qt
 from PyQt5.QtWidgets import *
 import time
 from views.ui import Interface
@@ -18,28 +18,16 @@ class Data(QWidget):
 
         lbl_title = QLabel("Data Management")
 
-        btn_cancel = self.ui.create_tertiary_btn("Cancel")
-
-        progress_box = QGroupBox("Progress Log")
-
         # Layout
         content_widget = QWidget()
         actions_widget = QWidget()
 
         content_area = QScrollArea()
-        global progress_scroll_area
-        progress_scroll_area = QScrollArea()
-        progress_scroll_area.setWidget(progress_box)
-        progress_scroll_area.setWidgetResizable(True)
-        progress_scroll_area.setFixedWidth(300)
 
         main_layout = QVBoxLayout()
         inner_layout = QHBoxLayout()
         content_layout = QHBoxLayout(content_widget)
         actions_layout = QVBoxLayout(actions_widget)
-        global progress_layout
-        progress_layout = QVBoxLayout(progress_box)
-        cancel_layout = QVBoxLayout()
 
         # Inner Layout
         inner_layout.addWidget(sidebar)
@@ -55,11 +43,8 @@ class Data(QWidget):
         # actions layout
         actions_layout.addWidget(lbl_title)
         actions_layout.addWidget(self.create_data_section("Satellite Imagery"))
-        actions_layout.addWidget(progress_scroll_area)
-
-        # progress layout
-        progress_layout.addStretch()
-        progress_layout.addLayout(cancel_layout)
+        actions_layout.addWidget(self.create_progress_widget())
+        actions_layout.addStretch()
 
         main_layout.addWidget(header)
         main_layout.addLayout(inner_layout)
@@ -69,12 +54,6 @@ class Data(QWidget):
         # Design
         lbl_title.setStyleSheet("font-size: 24px; font-weight: bold; margin: 20px 0;")
         content_area.setStyleSheet("border: none")
-
-        progress_box.setStyleSheet(self.ui.styles["section_style"])
-        progress_box.setMaximumHeight(400)
-
-        # Functions
-        btn_cancel.clicked.connect(self.cancel_download)
 
     def create_data_section(self, title):
         section = QGroupBox(title)
@@ -112,19 +91,71 @@ class Data(QWidget):
 
         return section
 
+    def create_progress_widget(self):
+        progress_widget = QGroupBox("Progress Log")
+        progress_widget.setStyleSheet("""
+            QGroupBox {
+                padding: 20px 20px 20px 10px;
+                border: 1px solid black;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                padding: 0 10px;
+                }
+        """)
+        progress_layout = QVBoxLayout(progress_widget)
+        progress_layout.addSpacing(50)
+        global txt_progress
+        txt_progress = QLabel("Start Download")
+        progress_layout.addWidget(txt_progress, alignment=Qt.AlignCenter)
+
+        # Create a scroll area for progress statements
+        self.progress_scroll_area = QScrollArea()
+        self.progress_scroll_area.setWidgetResizable(True)
+        self.progress_scroll_area.setFixedHeight(150)
+        self.progress_scroll_area.setMaximumHeight(150)
+
+        # Create a widget to hold the progress statements
+        self.progress_content = QWidget()
+        self.progress_content_layout = QVBoxLayout(self.progress_content)
+        self.progress_content_layout.setAlignment(Qt.AlignTop)
+        self.progress_scroll_area.setWidget(self.progress_content)
+
+        # Add the scroll area to the main layout
+        progress_layout.addWidget(self.progress_scroll_area)
+
+        # Create a cancel button
+        self.btn_cancel = self.ui.create_tertiary_btn("Cancel Download")
+        self.btn_cancel.clicked.connect(self.cancel_download)
+
+        # Add the cancel button to the layout
+        progress_layout.addWidget(self.btn_cancel)
+
+        return progress_widget
+
+    def add_progress_statement(self, message):
+        txt_progress.setText(f"{txt_progress.text()}\n\n{message}")
+
+
     def download_images(self):
         # Open the dialog to ask for directory
         folder = QFileDialog.getExistingDirectory(None, "Select Directory")
-        self.add_progress_statement(f"{folder} folder selected...")
         print(f"{folder} folder selected...")
+        self.add_progress_statement(f"{folder} folder selected...")
+
 
         # Check if a directory was selected
         if folder:
             # Provide start and end date for download (can also ask user for these inputs)
             start_date = self.date_from.date().toString("yyyy-MM-dd")  # Example date input
             end_date = self.date_to.date().toString("yyyy-MM-dd")
-            self.add_progress_statement(f"Start Date: {start_date}")
             print(f"Start Date: {start_date}")
+            self.add_progress_statement(f"Start Date: {start_date}")
+
             self.add_progress_statement(f"End Date: {end_date}")
             print(f"End Date: {end_date}")
 
@@ -145,14 +176,6 @@ class Data(QWidget):
         else:
             # Show a message if no directory is selected
             QMessageBox.warning(None, "No Directory Selected", "Please select a directory to save the images.")
-
-    def add_progress_statement(self, message):
-        """Dynamically add progress statements to the scrollable area."""
-        label = QLabel(message)
-        progress_layout.addWidget(label)
-        progress_layout.addStretch()  # Ensure labels are pushed to the top
-        progress_scroll_area.verticalScrollBar().setValue(
-        progress_scroll_area.verticalScrollBar().maximum())  # Auto-scroll to bottom
 
     def cancel_download(self):
 

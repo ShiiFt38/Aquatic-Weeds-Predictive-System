@@ -25,7 +25,7 @@ Before running the application, ensure you have the following:
 
 3. Create a `.env` file in the root directory of the project with your Google Earth Engine project ID:
    ```
-   GEE_PROJECT_ID=your_project_id_here
+   EarthEngine_Project=your_project_id_here
    ```
 
    This file is required for the `satellite_imagery.py` script to access Google Earth Engine services.

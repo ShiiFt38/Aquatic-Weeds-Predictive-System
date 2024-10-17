@@ -60,7 +60,7 @@ class Prediction(QWidget):
         upload_layout = QVBoxLayout(upload_widget)
         prediction_layout = QVBoxLayout(prediction_widget)
         chat_layout = QVBoxLayout(chat_widget)
-        prompt_area = QHBoxLayout()
+        prompt_layout = QHBoxLayout()
 
         # Inner Layout
         inner_layout.addWidget(sidebar)
@@ -113,10 +113,10 @@ class Prediction(QWidget):
         chat_area.setWidget(chat_widget)
         chat_area.setWidgetResizable(True)
         chat_layout.addStretch()
-        chat_layout.addLayout(prompt_area)
+        chat_layout.addLayout(prompt_layout)
 
-        prompt_area.addWidget(txt_chat_entry)
-        prompt_area.addWidget(btn_chat)
+        prompt_layout.addWidget(txt_chat_entry)
+        prompt_layout.addWidget(btn_chat)
 
         main_layout.addWidget(header)
         main_layout.addLayout(inner_layout)
