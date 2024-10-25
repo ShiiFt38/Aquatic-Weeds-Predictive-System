@@ -37,6 +37,7 @@ class App(QWidget):
         self.stack.addWidget(self.about)
         self.stack.addWidget(self.settings)
 
+
         layout = QVBoxLayout()
         layout.addWidget(self.stack)
         self.setLayout(layout)

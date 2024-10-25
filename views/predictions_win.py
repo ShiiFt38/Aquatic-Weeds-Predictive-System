@@ -190,9 +190,11 @@ class Prediction(QWidget):
         btn_upload.clicked.connect(self.handle_image_upload)
 
     def handle_image_upload(self):
+        print("Uploading Image...")
         file_dialog = QFileDialog()
         image_path, _ = file_dialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
 
+        print("processing image...")
         if image_path:
             processor = ImageProcessor(image_path)
 
@@ -201,10 +203,11 @@ class Prediction(QWidget):
             original_image.setAlignment(Qt.AlignCenter)
             original_image.setPixmap(pixmap_1.scaled(360, 360, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
+            print("Enhancing image...")
             enhancement = processor.enhance_green_vegetation()
             self.handle_image_transformation(enhancement, 1)
 
-            detected, veg_data = processor.detect_and_analyze_vegetation(enhancement)
+            detected, veg_data = processor.detect_and_analyze_vegetation(enhancement, image_path)
             self.handle_image_transformation(detected, 2)
 
     def handle_image_transformation(self, image, widget_index):

@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
+from models.db import VegetationDatabase
 
 
 class ImageProcessor():
     def __init__(self, input_image):
+        self.db = VegetationDatabase()
         self.input_image = input_image
         self.original_image = cv2.imread(self.input_image)
 
@@ -44,7 +46,7 @@ class ImageProcessor():
 
         return enhanced
 
-    def detect_and_analyze_vegetation(self, image):
+    def detect_and_analyze_vegetation(self, image, image_path):
         # Convert to HSV color space
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -90,6 +92,21 @@ class ImageProcessor():
                 # Draw contour and centroid on the image (for visualization)
                 cv2.drawContours(image, [contour], 0, (0, 255, 0), 2)
                 cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
+                self.db.store_scan_data(image_path, vegetation_data)
+
+        print("Storing image data...")
+        self.db.store_image_data(image_path, vegetation_data)
+        self.db.close()
         return image, vegetation_data
+
+"""
+    def get_model_training_data(self):
+        db = VegetationDatabase()
+        try:
+            features, targets = db.get_training_data()
+            return features, targets
+        finally:
+            db.close()
+            """
 
 

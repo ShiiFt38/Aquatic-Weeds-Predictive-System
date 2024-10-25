@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
+import datetime
+from models.db import VegetationDatabase
 from views.ui import Interface
 
 class Dashboard(QWidget):
@@ -73,20 +75,68 @@ class Dashboard(QWidget):
     # Functions
     def create_prediction_history(self):
         widget = QWidget()
-        widget.setStyleSheet("background-color: #E2E2E2; border-radius: 10px;")
+        widget.setStyleSheet("""
+            QWidget {
+                background-color: #E2E2E2; 
+                border-radius: 10px;
+            }
+            QTableWidget {
+                background-color: white;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                gridline-color: #f0f0f0;
+            }
+            QTableWidget::item {
+                padding: 5px;
+            }
+            QHeaderView::section {
+                background-color: #f8f9fa;
+                padding: 5px;
+                border: 1px solid #ddd;
+                font-weight: bold;
+            }
+        """)
         widget.setMaximumSize(1100, 400)
         layout = QVBoxLayout(widget)
         lbl_heading = self.ui.create_heading("Prediction History")
         layout.addWidget(lbl_heading)
 
-        table = QTableWidget(4, 2)
-        table.setHorizontalHeaderLabels(["Date", "Description"])
-        for i in range(4):
-            table.setItem(i, 0, QTableWidgetItem("2024/07/28"))
-            table.setItem(i, 1, QTableWidgetItem(""))
+        global table
+        table = QTableWidget(0, 6)
+        table.setHorizontalHeaderLabels([
+            "Date/Time",
+            "Image Path",
+            "Vegetation Count",
+            "Total Area",
+            "Avg Area",
+            "Details"
+        ])
+
+        table.setSelectionBehavior(QTableWidget.SelectRows)
+        table.setEditTriggers(QTableWidget.NoEditTriggers)
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        table.verticalHeader().setVisible(False)
+
         layout.addWidget(table)
 
         return widget
+
+    def refresh_prediction_history(self):
+        db = VegetationDatabase()
+        data = db.get_history_prediction()
+        table.setRowCount(len(data))
+
+        for row, record in enumerate(data):
+            # Parse timestamp
+            dt = datetime.fromisoformat(record[1])
+            formatted_dt = dt.strftime("%Y-%m-%d %H:%M")
+
+            # Create table items
+            table.setItem(row, 0, QTableWidgetItem(formatted_dt))
+            table.setItem(row, 1, QTableWidgetItem(record[2] or "N/A"))
+            table.setItem(row, 2, QTableWidgetItem(str(record[3])))
+            table.setItem(row, 3, QTableWidgetItem(f"{record[4]:.2f}"))
+            table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))
 
     def create_new_prediction(self):
         return self.ui.create_card_widget("New Prediction",
@@ -141,9 +191,13 @@ class Dashboard(QWidget):
                                        "Compare", "Assets/Images/undraw_split_testing_l1uw.png")
 
     def create_recent_predictions(self):
-        return self.ui.create_card_widget("Recent Predictions",
-                                       "Look back at previous forecasting",
-                                       "View", "Assets/Images/undraw_Booking_re_gw4j.png")
+        btn_refresh = self.ui.create_card_widget("Update Predictions",
+                                   "Look back at previous forecasting",
+                                   "Refresh", "Assets/Images/undraw_Booking_re_gw4j.png")
+
+        btn_refresh.clicked.connect(self.refresh_prediction_history)
+
+        return btn_refresh
 
     def create_reports(self):
         return self.ui.create_card_widget("Reports",
