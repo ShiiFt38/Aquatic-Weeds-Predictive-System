@@ -133,16 +133,15 @@ class VegetationDatabase:
         cursor.execute('''
                        SELECT 
                            i.scan_id,
-                           i.timestamp,
+                           i.date,
                            i.image_path,
                            i.total_vegetation_count,
                            SUM(v.area) as total_area,
                            AVG(v.area) as avg_area
                        FROM image_scans i
-                       LEFT JOIN vegetation_features v ON i.scan_id = v.scan_id
-                       GROUP BY i.scan_id
-                       ORDER BY i.timestamp DESC
-                       LIMIT 10
+                       LEFT JOIN vegetation_features v ON i.date = v.date
+                       GROUP BY i.date
+                       ORDER BY i.date
                    ''')
         data = cursor.fetchall()
 

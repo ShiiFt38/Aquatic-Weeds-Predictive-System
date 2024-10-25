@@ -1,3 +1,5 @@
+import sqlite3
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 import datetime
@@ -12,6 +14,28 @@ class Dashboard(QWidget):
         self.ui = Interface(self.stack)
 
         # Objects
+        self.table = QTableWidget(0, 6)
+        self.table.setHorizontalHeaderLabels([
+            "Date",
+            "Image Path",
+            "Vegetation Count",
+            "Total Area",
+            "Avg Area",
+            "Details"
+        ])
+
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.verticalHeader().setVisible(False)
+
+        # Track labels for statistics
+        self.lbl_stats = {
+            "Date": None,
+            "Scan ID": None,
+            "Vegetation Patches Count": None
+        }
+
         sidebar = self.ui.create_sidebar()
         header = self.ui.create_header()
 
@@ -101,42 +125,44 @@ class Dashboard(QWidget):
         lbl_heading = self.ui.create_heading("Prediction History")
         layout.addWidget(lbl_heading)
 
-        global table
-        table = QTableWidget(0, 6)
-        table.setHorizontalHeaderLabels([
-            "Date/Time",
-            "Image Path",
-            "Vegetation Count",
-            "Total Area",
-            "Avg Area",
-            "Details"
-        ])
-
-        table.setSelectionBehavior(QTableWidget.SelectRows)
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        table.verticalHeader().setVisible(False)
-
-        layout.addWidget(table)
+        layout.addWidget(self.table)
 
         return widget
 
     def refresh_prediction_history(self):
+        print("Populating prediction table...")
         db = VegetationDatabase()
-        data = db.get_history_prediction()
-        table.setRowCount(len(data))
 
-        for row, record in enumerate(data):
-            # Parse timestamp
-            dt = datetime.fromisoformat(record[1])
-            formatted_dt = dt.strftime("%Y-%m-%d %H:%M")
+        try:
+            # Get data from the database
+            data = db.get_history_prediction()
 
-            # Create table items
-            table.setItem(row, 0, QTableWidgetItem(formatted_dt))
-            table.setItem(row, 1, QTableWidgetItem(record[2] or "N/A"))
-            table.setItem(row, 2, QTableWidgetItem(str(record[3])))
-            table.setItem(row, 3, QTableWidgetItem(f"{record[4]:.2f}"))
-            table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))
+            # Update the statistics with the new data
+            self.update_stats(data)
+
+            # Set the row count to match the number of records
+            self.table.setRowCount(len(data))
+
+            # Loop through each record to populate the table
+            for row, record in enumerate(data):
+                if record[3] != 0:
+                    self.table.setItem(row, 0, QTableWidgetItem(record[1] or "N/A"))  # Date
+                    self.table.setItem(row, 1, QTableWidgetItem(record[2] or "N/A"))  # Image Path
+                    self.table.setItem(row, 2, QTableWidgetItem(str(record[3])))  # Vegetation Count
+                    self.table.setItem(row, 3, QTableWidgetItem(f"{record[4]:.2f}"))  # Total Area
+                    self.table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))  # Avg Area
+                    # Add scan details
+                    details = f"Scan ID: {record[0]}"
+                    self.table.setItem(row, 5, QTableWidgetItem(details))  # Details
+                else:
+                    pass
+        except sqlite3.Error as e:
+            QMessageBox.critical(
+                self,
+                'Error',
+                f'Error occurred while accessing database: {str(e)}',
+                QMessageBox.Ok
+            )
 
     def create_new_prediction(self):
         return self.ui.create_card_widget("New Prediction",
@@ -166,8 +192,8 @@ class Dashboard(QWidget):
 
         stats_layout = QHBoxLayout()
         stats_layout.setSpacing(40)
-        stats_layout.addWidget(self.create_prediction_stat("Total Affected Area"))
-        stats_layout.addWidget(self.create_prediction_stat("Rate of Spread"))
+        stats_layout.addWidget(self.create_prediction_stat("Date"))
+        stats_layout.addWidget(self.create_prediction_stat("Scan ID"))
         stats_layout.addWidget(self.create_prediction_stat("Vegetation Patches Count"))
         layout.addLayout(stats_layout)
 
@@ -175,7 +201,7 @@ class Dashboard(QWidget):
 
     def create_prediction_stat(self, title):
         widget = QWidget()
-        widget.setMinimumSize(150, 150)
+        widget.setMinimumSize(300, 150)
         layout = QVBoxLayout(widget)
         lbl_heading = self.ui.create_heading(title)
         layout.addWidget(lbl_heading, alignment=Qt.AlignCenter)
@@ -183,7 +209,47 @@ class Dashboard(QWidget):
         lbl_stat.setStyleSheet("color: #000000; font-size: 40px; font-weight: bold")
         layout.addWidget(lbl_stat, alignment=Qt.AlignCenter)
         layout.addSpacing(5)
+
+        # Save the lbl_stat for future updates
+        self.lbl_stats[title] = lbl_stat
+
         return widget
+
+    def update_stats(self, data):
+        if not data:
+            # If no data is available, reset stats to 0
+            self.lbl_stats["Date"].setText("0")
+            self.lbl_stats["Scan ID"].setText("0")
+            self.lbl_stats["Vegetation Patches Count"].setText("0")
+            return
+
+        # Initialize variables to keep track of the row with the highest scan_id
+        highest_scan_id = None
+        highest_scan_row = None
+
+        # Iterate through each row in the data to find the row with the highest scan_id
+        for row_index, record in enumerate(data):
+            current_scan_id = record[0]  # Assuming scan_id is at index 0
+            if highest_scan_id is None or current_scan_id > highest_scan_id:
+                highest_scan_id = current_scan_id
+                highest_scan_row = record
+
+        if highest_scan_row is None:
+            # If no valid row was found, reset stats
+            self.lbl_stats["Date"].setText("0")
+            self.lbl_stats["Scan ID"].setText("0")
+            self.lbl_stats["Vegetation Patches Count"].setText("0")
+            return
+
+        # Use the highest scan_id row's data
+        date = highest_scan_row[1]  # Assuming the total area is at index 4
+        vegetation_count = highest_scan_row[3]  # Assuming the vegetation count is at index 3
+        scan_id = highest_scan_id
+
+        # Update the labels with the data from the highest scan row
+        self.lbl_stats["Date"].setText(f"{date}")
+        self.lbl_stats["Scan ID"].setText(f"{scan_id}")
+        self.lbl_stats["Vegetation Patches Count"].setText(str(vegetation_count))
 
     def create_compare_predictions(self):
         return self.ui.create_card_widget("Compare Predictions",
@@ -193,15 +259,13 @@ class Dashboard(QWidget):
     def create_recent_predictions(self):
         btn_refresh = self.ui.create_card_widget("Update Predictions",
                                    "Look back at previous forecasting",
-                                   "Refresh", "Assets/Images/undraw_Booking_re_gw4j.png")
-
-        btn_refresh.clicked.connect(self.refresh_prediction_history)
+                                   "Refresh", "Assets/Images/undraw_Booking_re_gw4j.png", self.refresh_prediction_history)
 
         return btn_refresh
 
     def create_reports(self):
         return self.ui.create_card_widget("Reports",
                                        "Customise, edit and export valuable insights from reports",
-                                       "Generate", "Assets/Images/undraw_Done_checking_re_6vyx.png")
+                                       "Generate", "Assets/Images/undraw_Done_checking_re_6vyx.png", lambda: self.stack.setCurrentIndex(3))
 
 
