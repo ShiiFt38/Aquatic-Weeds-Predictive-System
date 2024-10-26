@@ -92,11 +92,20 @@ class ImageProcessor():
                 # Draw contour and centroid on the image (for visualization)
                 cv2.drawContours(image, [contour], 0, (0, 255, 0), 2)
                 cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
-                self.db.store_scan_data(image_path, vegetation_data)
 
-        print("Storing image data...")
-        self.db.store_image_data(image_path, vegetation_data)
-        self.db.close()
+                # Store vegetation patch data in each loop
+                if vegetation_data != []:
+                    self.db.store_scan_data(image_path, vegetation_data)
+                else:
+                    pass
+
+        # Store image data after loop is done
+        if vegetation_data != []:
+            print("Storing image data...")
+            self.db.store_image_data(image_path, vegetation_data)
+            self.db.close()
+        else:
+            print("No patches found...")
         return image, vegetation_data
 
 """

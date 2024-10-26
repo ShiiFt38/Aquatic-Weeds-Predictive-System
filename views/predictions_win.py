@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, QFile
 from PyQt5.QtGui import QPixmap, QImage
 from views.ui import Interface
 from controllers.image_processor import ImageProcessor
+from controllers.weather_handler import WeatherHandler
 
 
 class Prediction(QWidget):
@@ -33,7 +34,6 @@ class Prediction(QWidget):
 
         lbl_prediction_image = QLabel("Upload Image to Generate")
         btn_prediction = self.ui.create_tertiary_btn("Generate")
-
         txt_chat_entry = QLineEdit()
         txt_chat_entry.setPlaceholderText('Enter prompt here')
         btn_chat = QPushButton("Send")
@@ -189,10 +189,18 @@ class Prediction(QWidget):
 
         btn_upload.clicked.connect(self.handle_image_upload)
 
+    def retrieve_weather_data(self, date):
+        weather = WeatherHandler()
+
+        weather_data = weather.get_weather_data(date)
+        weather.print_weather_data(weather_data)
+
     def handle_image_upload(self):
         print("Uploading Image...")
         file_dialog = QFileDialog()
         image_path, _ = file_dialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
+        date = image_path[-14:-4]
+        self.retrieve_weather_data(date)
 
         print("processing image...")
         if image_path:
@@ -208,7 +216,13 @@ class Prediction(QWidget):
             self.handle_image_transformation(enhancement, 1)
 
             detected, veg_data = processor.detect_and_analyze_vegetation(enhancement, image_path)
-            self.handle_image_transformation(detected, 2)
+            if veg_data == []:
+               pixmap = QPixmap("Assets/Images/undraw_Searching_re_3ra9.png")
+               detected_image = images_layout.widget(2)
+               detected_image.setAlignment(Qt.AlignCenter)
+               detected_image.setPixmap(pixmap.scaled(360, 360, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            else:
+               self.handle_image_transformation(detected, 2)
 
     def handle_image_transformation(self, image, widget_index):
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

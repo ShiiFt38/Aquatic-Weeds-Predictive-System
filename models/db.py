@@ -148,6 +148,5 @@ class VegetationDatabase:
         return data
 
     def close(self):
-        """Close the database connection."""
         if self.conn:
             self.conn.close()
