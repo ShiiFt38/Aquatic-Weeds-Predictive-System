@@ -8,6 +8,7 @@ from views.data_win import Data
 from views.help_win import Help
 from views.about_win import About
 from views.settings_win import Settings
+from models.db import VegetationDatabase
 
 
 class App(QWidget):
@@ -18,12 +19,13 @@ class App(QWidget):
         self.setWindowIcon(QIcon("Assets/Images/Logo.png"))
 
         self.stack = QStackedWidget(self)
+        self.db = VegetationDatabase()
 
         self.login_widget = Login(self.stack)
-        self.dashboard_widget = Dashboard(self.stack)
-        self.predictions = Prediction(self.stack)
+        self.dashboard_widget = Dashboard(self.stack, self.db)
+        self.predictions = Prediction(self.stack, self.db)
         self.reports = Report(self.stack)
-        self.data = Data(self.stack)
+        self.data = Data(self.stack, self.db)
         self.help = Help(self.stack)
         self.about = About(self.stack)
         self.settings = Settings(self.stack)

@@ -1,6 +1,4 @@
-import sqlite3
-import json
-from datetime import datetime
+import sqlite3 as sq
 
 
 class VegetationDatabase:
@@ -12,23 +10,25 @@ class VegetationDatabase:
     def setup_database(self):
         print("Connecting to Database")
         try:
-            self.conn = sqlite3.connect(self.db_path)
+            self.conn = sq.connect(self.db_path)
             print("Connection success")
-        except sqlite3.Error as e:
+        except sq.Error as e:
             print(f"Database connection error: {e}")
-            return  # Exit if connection fails
+            return
 
         cursor = self.conn.cursor()
 
         # Create tables
+        print("Creating image scans table...")
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS image_scans (
-                scan_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT NOT NULL,
+                date TEXT PRIMARY KEY NOT NULL,
                 image_path TEXT,
                 total_vegetation_count INTEGER
-            )''')
+            )
+        ''')
 
+        print('Creating vegetation table...')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS vegetation_features (
                 feature_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +43,22 @@ class VegetationDatabase:
                 centroid_y INTEGER,
                 aspect_ratio REAL,
                 relative_position_x REAL,
-                relative_position_y REAL
+                relative_position_y REAL,
+                FOREIGN KEY (date) REFERENCES image_scans(date)
+            )
+        ''')
+
+        print("Creating weather table...")
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS weather_data (
+                weather_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT,
+                max_temp TEXT,
+                min_temp TEXT,
+                precipitation TEXT,
+                rainfall TEXT,
+                max_wind TEXT,
+                FOREIGN KEY (date) REFERENCES image_scans(date)
             )
         ''')
 
@@ -83,11 +98,22 @@ class VegetationDatabase:
     def store_image_data(self, image_path, vegetation_data):
         cursor = self.conn.cursor()
 
-        # Insert scan record
+        # 'Ignore into' handles primary key violations
         cursor.execute('''
-            INSERT INTO image_scans (date, image_path, total_vegetation_count)
+            INSERT OR IGNORE INTO image_scans (date, image_path, total_vegetation_count)
             VALUES (?, ?, ?)
         ''', (image_path[-14:-4], image_path, len(vegetation_data)))
+
+        self.conn.commit()
+
+    def store_weather_data(self, weather_data):
+        cursor = self.conn.cursor()
+
+        cursor.execute('''
+            INSERT INTO weather_data (date, max_temp, min_temp, precipitation, rainfall, max_wind)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (weather_data['date'], weather_data['max_temp'], weather_data['min_temp'], weather_data['precipitation'],
+              weather_data['rain'],weather_data['max_windspeed']))
 
         self.conn.commit()
 
@@ -131,17 +157,23 @@ class VegetationDatabase:
         cursor = self.conn.cursor()
 
         cursor.execute('''
-                       SELECT 
-                           i.scan_id,
+                       SELECT
+                            v.vegetation_id, 
                            i.date,
                            i.image_path,
                            i.total_vegetation_count,
                            SUM(v.area) as total_area,
-                           AVG(v.area) as avg_area
+                           AVG(v.area) as avg_area,
+                           w.max_temp,
+                           w.min_temp,
+                           w.precipitation,
+                           w.rainfall, 
+                           w.max_wind
                        FROM image_scans i
                        LEFT JOIN vegetation_features v ON i.date = v.date
+                       LEFT JOIN weather_data w ON i.date = w.date
                        GROUP BY i.date
-                       ORDER BY i.date
+                       ORDER BY v.vegetation_id
                    ''')
         data = cursor.fetchall()
 

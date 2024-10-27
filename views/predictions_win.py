@@ -8,10 +8,10 @@ from controllers.weather_handler import WeatherHandler
 
 
 class Prediction(QWidget):
-    def __init__(self, stack):
+    def __init__(self, stack, db):
         super().__init__()
         self.stack = stack
-
+        self.db = db
         self.ui = Interface(self.stack)
 
         self.image_list = ['Assets/Images/Hartbeespoort_original.jpg', 'Assets/Images/Enhanced_Vegetation.jpg',
@@ -189,22 +189,14 @@ class Prediction(QWidget):
 
         btn_upload.clicked.connect(self.handle_image_upload)
 
-    def retrieve_weather_data(self, date):
-        weather = WeatherHandler()
-
-        weather_data = weather.get_weather_data(date)
-        weather.print_weather_data(weather_data)
-
     def handle_image_upload(self):
         print("Uploading Image...")
         file_dialog = QFileDialog()
         image_path, _ = file_dialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
-        date = image_path[-14:-4]
-        self.retrieve_weather_data(date)
 
         print("processing image...")
         if image_path:
-            processor = ImageProcessor(image_path)
+            processor = ImageProcessor(image_path, self.db)
 
             pixmap_1 = QPixmap(image_path)
             original_image = images_layout.widget(0)

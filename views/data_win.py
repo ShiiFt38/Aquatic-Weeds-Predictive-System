@@ -1,19 +1,16 @@
 import sqlite3
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *
-import time
-
-from models.db import VegetationDatabase
 from views.ui import Interface
 from controllers.satellite_imagery import Satellite
 from controllers.downloader import DownloadThread
 
 class Data(QWidget):
-    def __init__(self, stack):
+    def __init__(self, stack,db):
         super().__init__()
         self.stack = stack
-
         self.ui = Interface(self.stack)
+        self.db = db
 
         # Objects
         sidebar = self.ui.create_sidebar()
@@ -130,10 +127,8 @@ class Data(QWidget):
             self.delete_all_data()
 
     def delete_all_data(self):
-        db = VegetationDatabase()
-
         try:
-            db.delete_all_data()
+            self.db.delete_all_data()
 
             QMessageBox.information(
                 self,
@@ -151,7 +146,7 @@ class Data(QWidget):
             )
 
         finally:
-            db.close()
+            self.db.close()
 
 
     def download_images(self):

@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
-from models.db import VegetationDatabase
 
 
 class ImageProcessor():
-    def __init__(self, input_image):
-        self.db = VegetationDatabase()
+    def __init__(self, input_image, db):
+        self.db = db
         self.input_image = input_image
         self.original_image = cv2.imread(self.input_image)
 
@@ -103,19 +102,17 @@ class ImageProcessor():
         if vegetation_data != []:
             print("Storing image data...")
             self.db.store_image_data(image_path, vegetation_data)
-            self.db.close()
         else:
             print("No patches found...")
         return image, vegetation_data
 
 """
     def get_model_training_data(self):
-        db = VegetationDatabase()
         try:
-            features, targets = db.get_training_data()
+            features, targets = self.db.get_training_data()
             return features, targets
         finally:
-            db.close()
+            self.db.close()
             """
 
 

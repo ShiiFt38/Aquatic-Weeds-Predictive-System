@@ -4,7 +4,8 @@ from typing import Dict, Any
 
 
 class WeatherHandler:
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         # Hartbeespoortdam coordinates
         self.latitude = -25.7447
         self.longitude = 27.8521
@@ -109,6 +110,9 @@ class WeatherHandler:
                 'rain': data['daily']['rain_sum'][0],
                 'max_windspeed': data['daily']['windspeed_10m_max'][0]
             }
+
+            if weather_info:
+                self.db.store_weather_data(weather_info)
 
             return weather_info
 

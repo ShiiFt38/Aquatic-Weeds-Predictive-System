@@ -2,15 +2,13 @@ import sqlite3
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-import datetime
-from models.db import VegetationDatabase
 from views.ui import Interface
 
 class Dashboard(QWidget):
-    def __init__(self, stack):
+    def __init__(self, stack, db):
         super().__init__()
         self.stack = stack
-
+        self.db = db
         self.ui = Interface(self.stack)
 
         # Objects
@@ -32,7 +30,7 @@ class Dashboard(QWidget):
         # Track labels for statistics
         self.lbl_stats = {
             "Date": None,
-            "Scan ID": None,
+            "Total Area Covered": None,
             "Vegetation Patches Count": None
         }
 
@@ -131,14 +129,12 @@ class Dashboard(QWidget):
 
     def refresh_prediction_history(self):
         print("Populating prediction table...")
-        db = VegetationDatabase()
-
         try:
             # Get data from the database
-            data = db.get_history_prediction()
+            data = self.db.get_history_prediction()
 
             # Update the statistics with the new data
-            self.update_stats(data)
+            self.update_stats()
 
             # Set the row count to match the number of records
             self.table.setRowCount(len(data))
@@ -151,9 +147,11 @@ class Dashboard(QWidget):
                     self.table.setItem(row, 2, QTableWidgetItem(str(record[3])))  # Vegetation Count
                     self.table.setItem(row, 3, QTableWidgetItem(f"{record[4]:.2f}"))  # Total Area
                     self.table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))  # Avg Area
-                    # Add scan details
-                    details = f"Scan ID: {record[0]}"
-                    self.table.setItem(row, 5, QTableWidgetItem(details))  # Details
+                    # Below includes columns, max_temp, min_temp, precipitation, rainfall, and max_wind
+                    details = (f"Max temperature: {record[6] or 'N/A'}, Min temperature: {record[7]}, "
+                               f"Total Precipitation: {record[8]}, Rainfall: {record[9]},"
+                               f" Maximum wind speed: {record[10]}")
+                    self.table.setItem(row, 5, QTableWidgetItem(details))
                 else:
                     pass
         except sqlite3.Error as e:
@@ -193,7 +191,7 @@ class Dashboard(QWidget):
         stats_layout = QHBoxLayout()
         stats_layout.setSpacing(40)
         stats_layout.addWidget(self.create_prediction_stat("Date"))
-        stats_layout.addWidget(self.create_prediction_stat("Scan ID"))
+        stats_layout.addWidget(self.create_prediction_stat("Total Area Covered"))
         stats_layout.addWidget(self.create_prediction_stat("Vegetation Patches Count"))
         layout.addLayout(stats_layout)
 
@@ -215,41 +213,32 @@ class Dashboard(QWidget):
 
         return widget
 
-    def update_stats(self, data):
-        if not data:
-            # If no data is available, reset stats to 0
-            self.lbl_stats["Date"].setText("0")
-            self.lbl_stats["Scan ID"].setText("0")
-            self.lbl_stats["Vegetation Patches Count"].setText("0")
-            return
+    def update_stats(self):
+        print("Updating statistics...")
 
-        # Initialize variables to keep track of the row with the highest scan_id
-        highest_scan_id = None
-        highest_scan_row = None
+        # Get the last row index in the table
+        first_row = 0
+        if first_row < 0:
+            return  # No rows available, exit the function
 
-        # Iterate through each row in the data to find the row with the highest scan_id
-        for row_index, record in enumerate(data):
-            current_scan_id = record[0]  # Assuming scan_id is at index 0
-            if highest_scan_id is None or current_scan_id > highest_scan_id:
-                highest_scan_id = current_scan_id
-                highest_scan_row = record
+        try:
+            # Retrieve data from the last row in the table
+            date = self.table.item(first_row, 0).text() if self.table.item(first_row, 0) else "N/A"
+            vegetation_count = int(self.table.item(first_row, 2).text()) if self.table.item(first_row, 2) else 0
+            total_area = float(self.table.item(first_row, 3).text()) if self.table.item(first_row, 3) else 0.0
 
-        if highest_scan_row is None:
-            # If no valid row was found, reset stats
-            self.lbl_stats["Date"].setText("0")
-            self.lbl_stats["Scan ID"].setText("0")
-            self.lbl_stats["Vegetation Patches Count"].setText("0")
-            return
+            # Update your statistics variables or UI elements with this data
+            self.lbl_stats["Date"].setText(f"{date}")
+            self.lbl_stats["Total Area Covered"].setText(f"{total_area}")
+            self.lbl_stats["Vegetation Patches Count"].setText(str(vegetation_count))
 
-        # Use the highest scan_id row's data
-        date = highest_scan_row[1]  # Assuming the total area is at index 4
-        vegetation_count = highest_scan_row[3]  # Assuming the vegetation count is at index 3
-        scan_id = highest_scan_id
-
-        # Update the labels with the data from the highest scan row
-        self.lbl_stats["Date"].setText(f"{date}")
-        self.lbl_stats["Scan ID"].setText(f"{scan_id}")
-        self.lbl_stats["Vegetation Patches Count"].setText(str(vegetation_count))
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                'Error',
+                f'Error occurred while updating statistics: {str(e)}',
+                QMessageBox.Ok
+            )
 
     def create_compare_predictions(self):
         return self.ui.create_card_widget("Compare Predictions",
