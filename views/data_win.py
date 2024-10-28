@@ -138,6 +138,11 @@ class Data(QWidget):
                 QMessageBox.Ok
             )
 
+            QMessageBox.information(self, 'Restart Needed',
+                                    'The app needs to restart to complete resetting the database.'
+                                    ' Please close and open the app again.',
+                                    QMessageBox.Ok)
+
         except sqlite3.Error as e:
             QMessageBox.critical(
                 self,

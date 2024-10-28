@@ -189,10 +189,19 @@ class Prediction(QWidget):
 
         btn_upload.clicked.connect(self.handle_image_upload)
 
+    def retrieve_weather_data(self, date):
+        weather = WeatherHandler(self.db)
+
+        weather_data = weather.get_historical_weather_data(date)
+        weather.print_weather_data(weather_data)
+
     def handle_image_upload(self):
         print("Uploading Image...")
-        file_dialog = QFileDialog()
-        image_path, _ = file_dialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
+        file_dialog = QFileDialog(self)
+        image_path, _ = file_dialog.getOpenFileName(self, "Select Image",
+                                                    "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
+        date = image_path[-14:-4]
+        self.retrieve_weather_data(date)
 
         print("processing image...")
         if image_path:
