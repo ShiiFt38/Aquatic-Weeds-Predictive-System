@@ -1,3 +1,4 @@
+# TODO: Add a datetime column in image_scans for tracking latest data entry
 import sqlite3 as sq
 
 
@@ -18,8 +19,6 @@ class VegetationDatabase:
 
         cursor = self.conn.cursor()
 
-        # Create tables
-        print("Creating image scans table...")
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS image_scans (
                 date TEXT PRIMARY KEY NOT NULL,
@@ -28,7 +27,6 @@ class VegetationDatabase:
             )
         ''')
 
-        print('Creating vegetation table...')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS vegetation_features (
                 feature_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,7 +46,6 @@ class VegetationDatabase:
             )
         ''')
 
-        print("Creating weather table...")
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS weather_data (
                 weather_id INTEGER PRIMARY KEY AUTOINCREMENT,

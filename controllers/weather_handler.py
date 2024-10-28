@@ -18,9 +18,10 @@ class WeatherHandler:
             current_date = datetime.now()
 
             # Check if date is within reasonable range (7 days past to 7 days future)
-            if target_date < current_date - timedelta(days=7) or target_date > current_date + timedelta(days=7):
-                print(f"Warning: Date {date_str} might be outside the available range. Using historical API endpoint.")
-                return self.get_historical_weather_data(date_str)
+
+            print(f"Warning: Date {date_str} might be outside the available range. Using historical API endpoint.")
+            if date_str:
+                self.get_historical_weather_data(date_str)
 
             # Define parameters for the API request
             params = {
@@ -93,6 +94,8 @@ class WeatherHandler:
             }
 
             response = requests.get(historical_url, params=params)
+            print("Response Status Code:", response.status_code)  # Debug print for status code
+
             response.raise_for_status()
 
             # Print raw response for debugging

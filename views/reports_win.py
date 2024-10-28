@@ -1,12 +1,15 @@
+# TODO: Add generating documents functionality
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *
 from views.ui import Interface
+from controllers.file_exporter import ExportReports
+from models.db_export_utility import ExportUtility
 
 class Report(QWidget):
-    def __init__(self, stack):
+    def __init__(self, stack, db):
         super().__init__()
         self.stack = stack
-
+        self.db = db
         self.ui = Interface(self.stack)
 
         # Objects
@@ -86,7 +89,31 @@ class Report(QWidget):
         layout.addStretch()
 
         btn_generate = self.ui.create_tertiary_btn("Generate Report")
+        btn_generate.clicked.connect(lambda: self.generate_report(title, date_from, date_to))
         layout.addWidget(btn_generate)
 
         return section
+
+    def generate_report(self, report_type, date_from, date_to):
+        exporter = ExportReports(self.db)
+        export_utility = ExportUtility(self.db)
+
+        start_date = date_from.date().toString("yyyy-MM-dd")
+        end_date = date_to.date().toString("yyyy-MM-dd")
+
+        data = export_utility.export_vegetation_data(start_date, end_date)
+
+        file_path = QFileDialog.getSaveFileName(self, "Save Excel Report",
+                                                "", "Excel Files (*.xlsx)")[0]
+        if not file_path:
+            return
+
+        print("Saving excel file")
+        if "Excel" in report_type:
+            if not file_path.endswith(".xlsx"):
+                file_path += ".xlsx"
+            print(f"Saving to {file_path}")
+            exporter.save_to_excel(data, file_path)
+        else:
+            pass
 

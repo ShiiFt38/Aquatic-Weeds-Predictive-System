@@ -1,3 +1,4 @@
+# TODO: Add a QMessage to notify users to restart the app after resetting the database
 import sqlite3
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *

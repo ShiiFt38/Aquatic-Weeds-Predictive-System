@@ -148,9 +148,9 @@ class Dashboard(QWidget):
                     self.table.setItem(row, 3, QTableWidgetItem(f"{record[4]:.2f}"))  # Total Area
                     self.table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))  # Avg Area
                     # Below includes columns, max_temp, min_temp, precipitation, rainfall, and max_wind
-                    details = (f"Max temperature: {record[6] or 'N/A'}, Min temperature: {record[7]}, "
-                               f"Total Precipitation: {record[8]}, Rainfall: {record[9]},"
-                               f" Maximum wind speed: {record[10]}")
+                    details = (f"Max temperature: {record[6]}\N{DEGREE SIGN}C, Min temperature: {record[7]}\N{DEGREE SIGN}C, "
+                               f"Total Precipitation: {record[8]}mm, Rainfall: {record[9]}mm,"
+                               f" Maximum wind speed: {record[10]}km/h")
                     self.table.setItem(row, 5, QTableWidgetItem(details))
                 else:
                     pass
@@ -224,8 +224,8 @@ class Dashboard(QWidget):
         try:
             # Retrieve data from the last row in the table
             date = self.table.item(first_row, 0).text() if self.table.item(first_row, 0) else "N/A"
-            vegetation_count = int(self.table.item(first_row, 2).text()) if self.table.item(first_row, 2) else 0
-            total_area = float(self.table.item(first_row, 3).text()) if self.table.item(first_row, 3) else 0.0
+            vegetation_count = int(self.table.item(first_row, 2).text()) if self.table.item(first_row, 2) else "N/A"
+            total_area = float(self.table.item(first_row, 3).text()) if self.table.item(first_row, 3) else "N/A"
 
             # Update your statistics variables or UI elements with this data
             self.lbl_stats["Date"].setText(f"{date}")

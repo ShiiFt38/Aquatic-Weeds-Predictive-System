@@ -24,7 +24,7 @@ class App(QWidget):
         self.login_widget = Login(self.stack)
         self.dashboard_widget = Dashboard(self.stack, self.db)
         self.predictions = Prediction(self.stack, self.db)
-        self.reports = Report(self.stack)
+        self.reports = Report(self.stack, self.db)
         self.data = Data(self.stack, self.db)
         self.help = Help(self.stack)
         self.about = About(self.stack)
