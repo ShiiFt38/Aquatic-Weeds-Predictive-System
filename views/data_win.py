@@ -1,4 +1,4 @@
-# TODO: Add a QMessage to notify users to restart the app after resetting the database
+# TODO: Add a QMessage to notify users that their report is saved successfully
 import sqlite3
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *

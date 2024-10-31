@@ -1,4 +1,3 @@
-# TODO: Add a datetime column in image_scans for tracking latest data entry
 import sqlite3 as sq
 
 
@@ -23,7 +22,8 @@ class VegetationDatabase:
             CREATE TABLE IF NOT EXISTS image_scans (
                 date TEXT PRIMARY KEY NOT NULL,
                 image_path TEXT,
-                total_vegetation_count INTEGER
+                total_vegetation_count INTEGER,
+                time_scanned TEXT
             )
         ''')
 
@@ -59,11 +59,29 @@ class VegetationDatabase:
             )
         ''')
 
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS vegetation_predictions (
+                prediction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT,
+                vegetation_id INTEGER,
+                predicted_centroid_x INTEGER,
+                predicted_centroid_y INTEGER,
+                model_used TEXT,
+                FOREIGN KEY (date) REFERENCES image_scans(date)
+            )
+        ''')
+
         self.conn.commit()
 
     def store_scan_data(self,image_path, vegetation_data):
         """Store a complete scan including all vegetation features."""
         cursor = self.conn.cursor()
+
+        vegetation_count = len(vegetation_data)
+        if vegetation_count == 0:
+            print("No vegetation data to store.")
+            return
+
 
         # Process and store each vegetation feature
         for veg in vegetation_data:
@@ -92,15 +110,15 @@ class VegetationDatabase:
 
         self.conn.commit()
 
-    def store_image_data(self, image_path, vegetation_data):
+    def store_image_data(self, image_path, vegetation_data, time):
         cursor = self.conn.cursor()
 
         # 'Ignore into' handles primary key violations
         cursor.execute('''
-            INSERT OR IGNORE INTO image_scans (date, image_path, total_vegetation_count)
-            VALUES (?, ?, ?)
-        ''', (image_path[-14:-4], image_path, len(vegetation_data)))
-
+            INSERT OR IGNORE INTO image_scans (date, image_path, total_vegetation_count, time_scanned)
+            VALUES (?, ?, ?, ?)
+        ''', (image_path[-14:-4], image_path, len(vegetation_data), time))
+        print("Data Stored Successfully!")
         self.conn.commit()
 
     def store_weather_data(self, weather_data):
@@ -112,6 +130,16 @@ class VegetationDatabase:
         ''', (weather_data['date'], weather_data['max_temp'], weather_data['min_temp'], weather_data['precipitation'],
               weather_data['rain'],weather_data['max_windspeed']))
 
+        self.conn.commit()
+
+    def store_prediction_data(self, data_df):
+        cursor = self.conn.cursor()
+        for _, row in data_df.iterrows():
+            cursor.execute('''
+                        INSERT INTO vegetation_predictions (date, vegetation_id, predicted_centroid_x, predicted_centroid_y, model_used)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (row['date'], row['vegetation_id'], row['predicted_centroid_x'], row['predicted_centroid_y'],
+                          'DecisionTree'))
         self.conn.commit()
 
     def get_training_data(self):
@@ -145,7 +173,12 @@ class VegetationDatabase:
         # Delete all records from both tables
         cursor.execute("DELETE FROM vegetation_features")
         cursor.execute("DELETE FROM image_scans")
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='vegetation_features' OR name='image_scans'")
+        cursor.execute("DELETE FROM weather_data")
+        cursor.execute("DELETE FROM vegetation_predictions")
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='vegetation_features' "
+                       "OR name='image_scans' "
+                       "OR name='weather_data' "
+                       "OR name='vegetation_predictions'")
 
         self.conn.commit()
         return cursor.rowcount
@@ -165,12 +198,13 @@ class VegetationDatabase:
                            w.min_temp,
                            w.precipitation,
                            w.rainfall, 
-                           w.max_wind
+                           w.max_wind,
+                           i.time_scanned
                        FROM image_scans i
                        LEFT JOIN vegetation_features v ON i.date = v.date
                        LEFT JOIN weather_data w ON i.date = w.date
                        GROUP BY i.date
-                       ORDER BY v.vegetation_id
+                       ORDER BY i.time_scanned
                    ''')
         data = cursor.fetchall()
 
@@ -179,3 +213,6 @@ class VegetationDatabase:
     def close(self):
         if self.conn:
             self.conn.close()
+
+    def get_connection(self):
+        return self.conn

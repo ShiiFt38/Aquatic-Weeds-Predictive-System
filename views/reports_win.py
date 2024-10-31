@@ -1,4 +1,5 @@
 # TODO: Add generating documents functionality
+import os
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *
 from views.ui import Interface
@@ -103,17 +104,65 @@ class Report(QWidget):
 
         data = export_utility.export_vegetation_data(start_date, end_date)
 
-        file_path = QFileDialog.getSaveFileName(self, "Save Excel Report",
-                                                "", "Excel Files (*.xlsx)")[0]
-        if not file_path:
-            return
-
         print("Saving excel file")
         if "Excel" in report_type:
+            file_path = QFileDialog.getSaveFileName(
+                self,
+                "Save Excel Report",
+                "",
+                "Excel Files (*.xlsx)"
+            )[0]
+
+            if not file_path:
+                return
+
             if not file_path.endswith(".xlsx"):
                 file_path += ".xlsx"
-            print(f"Saving to {file_path}")
+
+            print(f"Saving to Excel: {file_path}")
             exporter.save_to_excel(data, file_path)
+
+        elif "CSV" in report_type:
+            file_path = QFileDialog.getSaveFileName(
+                self,
+                "Save CSV Reports",
+                "",
+                "CSV Files (*.csv)"
+            )[0]
+
+            if not file_path:
+                return
+
+            # Remove .csv extension if present to use as base path
+            base_path = file_path.rsplit('.csv', 1)[0]
+
+            print(f"Saving to CSV: {base_path}")
+            saved_files = exporter.save_to_csv(data, base_path)
+
+            # Optionally show a success message with all saved files
+            print("Successfully saved CSV files:")
+            for file in saved_files:
+                print(f"- {file}")
+
+        elif "PDF" in report_type:
+            file_path = QFileDialog.getSaveFileName(
+                self,
+                "Save PDF Report",
+                "",
+                "PDF Files (*.pdf)"
+            )[0]
+            if not file_path:
+                return
+
+            # Assuming logo is in the assets directory relative to the script
+            logo_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                "Assets/Images",
+                "Logo.png"
+            )
+
+            print(f"Saving to PDF: {file_path}")
+            exporter.save_to_pdf(data, file_path, logo_path, start_date, end_date)
         else:
             pass
 

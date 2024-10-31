@@ -133,9 +133,6 @@ class Dashboard(QWidget):
             # Get data from the database
             data = self.db.get_history_prediction()
 
-            # Update the statistics with the new data
-            self.update_stats()
-
             # Set the row count to match the number of records
             self.table.setRowCount(len(data))
 
@@ -149,9 +146,12 @@ class Dashboard(QWidget):
                     self.table.setItem(row, 4, QTableWidgetItem(f"{record[5]:.2f}"))  # Avg Area
                     # Below includes columns, max_temp, min_temp, precipitation, rainfall, and max_wind
                     details = (f"Max temperature: {record[6]}\N{DEGREE SIGN}C, Min temperature: {record[7]}\N{DEGREE SIGN}C, "
-                               f"Total Precipitation: {record[8]}mm, Rainfall: {record[9]}mm,"
-                               f" Maximum wind speed: {record[10]}km/h")
+                               f"Total Precipitation: {record[8]} mm, Rainfall: {record[9]} mm,"
+                               f" Maximum wind speed: {record[10]} km/h")
                     self.table.setItem(row, 5, QTableWidgetItem(details))
+
+                    # Update the statistics with the new data
+                    self.update_stats()
                 else:
                     pass
         except sqlite3.Error as e:
@@ -217,15 +217,15 @@ class Dashboard(QWidget):
         print("Updating statistics...")
 
         # Get the last row index in the table
-        first_row = 0
-        if first_row < 0:
+        last_row = self.table.rowCount() - 1
+        if last_row < 0:
             return  # No rows available, exit the function
 
         try:
             # Retrieve data from the last row in the table
-            date = self.table.item(first_row, 0).text() if self.table.item(first_row, 0) else "N/A"
-            vegetation_count = int(self.table.item(first_row, 2).text()) if self.table.item(first_row, 2) else "N/A"
-            total_area = float(self.table.item(first_row, 3).text()) if self.table.item(first_row, 3) else "N/A"
+            date = self.table.item(last_row, 0).text() if self.table.item(last_row, 0) else "N/A"
+            vegetation_count = int(self.table.item(last_row, 2).text()) if self.table.item(last_row, 2) else "N/A"
+            total_area = float(self.table.item(last_row, 3).text()) if self.table.item(last_row, 3) else "N/A"
 
             # Update your statistics variables or UI elements with this data
             self.lbl_stats["Date"].setText(f"{date}")

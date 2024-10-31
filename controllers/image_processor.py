@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from datetime import datetime
 
 
 class ImageProcessor():
@@ -92,6 +93,7 @@ class ImageProcessor():
                 cv2.drawContours(image, [contour], 0, (0, 255, 0), 2)
                 cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
 
+
                 # Store vegetation patch data in each loop
                 if vegetation_data != []:
                     self.db.store_scan_data(image_path, vegetation_data)
@@ -101,18 +103,26 @@ class ImageProcessor():
         # Store image data after loop is done
         if vegetation_data != []:
             print("Storing image data...")
-            self.db.store_image_data(image_path, vegetation_data)
+            current_time = datetime.now()
+            print(f"current_time: {current_time}")
+            self.db.store_image_data(image_path, vegetation_data, current_time )
         else:
             print("No patches found...")
         return image, vegetation_data
 
-"""
-    def get_model_training_data(self):
-        try:
-            features, targets = self.db.get_training_data()
-            return features, targets
-        finally:
-            self.db.close()
+    def plot_predicted_centroids(self, image, predicted_data):
             """
+            Plots predicted centroids on the image in purple.
+            :param image: The image to draw on.
+            :param predicted_data: A list of dictionaries with keys 'predicted_centroid_x' and 'predicted_centroid_y'.
+            :return: The image with predicted centroids plotted.
+            """
+            for data in predicted_data:
+                cx = int(data["predicted_centroid_x"])
+                cy = int(data["predicted_centroid_y"])
+                # Draw the predicted centroid in purple
+                cv2.circle(image, (cx, cy), 10, (255, 0, 255), -1)  # Purple color (BGR format)
+
+            return image
 
 

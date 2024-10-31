@@ -2,9 +2,12 @@ import cv2
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QFile
 from PyQt5.QtGui import QPixmap, QImage
+import os
+from models.db import VegetationDatabase
 from views.ui import Interface
 from controllers.image_processor import ImageProcessor
 from controllers.weather_handler import WeatherHandler
+from controllers.centroid_predictor import PredictionModel
 
 
 class Prediction(QWidget):
@@ -13,6 +16,7 @@ class Prediction(QWidget):
         self.stack = stack
         self.db = db
         self.ui = Interface(self.stack)
+        self.prediction_model = PredictionModel()
 
         self.image_list = ['Assets/Images/Hartbeespoort_original.jpg', 'Assets/Images/Enhanced_Vegetation.jpg',
                            'Assets/Images/Detected analysis.jpg']
@@ -32,7 +36,7 @@ class Prediction(QWidget):
         lbl_upload_image.setAlignment(Qt.AlignCenter)
         btn_upload = self.ui.create_tertiary_btn("Upload")
 
-        lbl_prediction_image = QLabel("Upload Image to Generate")
+        self.lbl_prediction_image = QLabel("Upload Image to Generate")
         btn_prediction = self.ui.create_tertiary_btn("Generate")
         txt_chat_entry = QLineEdit()
         txt_chat_entry.setPlaceholderText('Enter prompt here')
@@ -105,7 +109,7 @@ class Prediction(QWidget):
 
         # Content layout > First column > Prediction card widget
         prediction_layout.setSpacing(5)
-        prediction_layout.addWidget(lbl_prediction_image, alignment=Qt.AlignCenter)
+        prediction_layout.addWidget(self.lbl_prediction_image, alignment=Qt.AlignCenter)
         prediction_layout.addWidget(btn_prediction, alignment=Qt.AlignCenter)
 
         # Content layout > second column
@@ -188,6 +192,7 @@ class Prediction(QWidget):
         btn_detected.clicked.connect(lambda: images_layout.setCurrentIndex(2))
 
         btn_upload.clicked.connect(self.handle_image_upload)
+        btn_prediction.clicked.connect(self.handle_generate_prediction)
 
     def retrieve_weather_data(self, date):
         weather = WeatherHandler(self.db)
@@ -201,7 +206,8 @@ class Prediction(QWidget):
         image_path, _ = file_dialog.getOpenFileName(self, "Select Image",
                                                     "", "Image Files (*.png *.jpg *.jpeg *.bmp *.tif)")
         date = image_path[-14:-4]
-        self.retrieve_weather_data(date)
+        if date:
+            self.retrieve_weather_data(date)
 
         print("processing image...")
         if image_path:
@@ -238,3 +244,71 @@ class Prediction(QWidget):
         enhanced_image = images_layout.widget(widget_index)
         enhanced_image.setAlignment(Qt.AlignCenter)
         enhanced_image.setPixmap(pixmap_2.scaled(360, 360, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+    def handle_generate_prediction(self):
+        self.prediction_model.train_model()
+        self.prediction_model.predict_and_store()
+
+        conn = VegetationDatabase().get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+        SELECT image_path
+        FROM image_scans
+        ORDER BY time_scanned DESC
+        LIMIT 1
+    ''')
+
+        result = cursor.fetchone()
+        if result:
+            image_path = result[0]
+            print(f"Image fetched: {image_path}")
+        else:
+            print("No image found.")
+            return
+
+        # Fetch the latest prediction data
+        cursor.execute('''
+            SELECT predicted_centroid_x, predicted_centroid_y
+            FROM vegetation_predictions
+            ORDER BY prediction_id DESC
+            LIMIT 1
+        ''')
+        prediction_result = cursor.fetchone()
+        if prediction_result:
+            predicted_data = [
+                {
+                    "predicted_centroid_x": prediction_result[0],
+                    "predicted_centroid_y": prediction_result[1]
+                }
+            ]
+        else:
+            print("No prediction data found.")
+            return
+
+        image = cv2.imread(image_path)
+        if image is None:
+            print("Error loading image.")
+            return
+
+        # Initialize ImageProcessor and plot predicted centroids
+        processor = ImageProcessor(image_path, self.db)
+        image_with_predictions = processor.plot_predicted_centroids(image, predicted_data)
+
+        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder to Save Image")
+        if not folder_path:
+            print("No folder selected.")
+            return
+
+        # Define the full path for saving the image
+        save_path = os.path.join(folder_path, "image_with_predictions.png")
+
+        # Save the image with plotted centroids
+        cv2.imwrite(save_path, image_with_predictions)
+        print(f"Image saved to {save_path}")
+
+        pixmap = QPixmap(save_path)
+        self.lbl_prediction_image.setPixmap(pixmap.scaled(240, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+        # Close the database connection
+        # conn.close()
