@@ -19,7 +19,7 @@ class Dashboard(QWidget):
             "Vegetation Count",
             "Total Area",
             "Avg Area",
-            "Details"
+            "Weather Details"
         ])
 
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -214,8 +214,6 @@ class Dashboard(QWidget):
         return widget
 
     def update_stats(self):
-        print("Updating statistics...")
-
         # Get the last row index in the table
         last_row = self.table.rowCount() - 1
         if last_row < 0:

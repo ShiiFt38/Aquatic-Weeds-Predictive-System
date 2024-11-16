@@ -8,7 +8,7 @@ from views.ui import Interface
 from controllers.image_processor import ImageProcessor
 from controllers.weather_handler import WeatherHandler
 from controllers.centroid_predictor import PredictionModel
-
+from controllers.gemini_assistant import GeminiAssistant
 
 class Prediction(QWidget):
     def __init__(self, stack, db):
@@ -16,7 +16,8 @@ class Prediction(QWidget):
         self.stack = stack
         self.db = db
         self.ui = Interface(self.stack)
-        self.prediction_model = PredictionModel()
+        self.prediction_model = PredictionModel(self.db)
+        self.gemini_assistant = GeminiAssistant()
 
         self.image_list = ['Assets/Images/Hartbeespoort_original.jpg', 'Assets/Images/Enhanced_Vegetation.jpg',
                            'Assets/Images/Detected analysis.jpg']
@@ -38,6 +39,7 @@ class Prediction(QWidget):
 
         self.lbl_prediction_image = QLabel("Upload Image to Generate")
         btn_prediction = self.ui.create_tertiary_btn("Generate")
+        global txt_chat_entry
         txt_chat_entry = QLineEdit()
         txt_chat_entry.setPlaceholderText('Enter prompt here')
         btn_chat = QPushButton("Send")
@@ -194,6 +196,8 @@ class Prediction(QWidget):
         btn_upload.clicked.connect(self.handle_image_upload)
         btn_prediction.clicked.connect(self.handle_generate_prediction)
 
+        btn_chat.clicked.connect(self.handle_chat)
+
     def retrieve_weather_data(self, date):
         weather = WeatherHandler(self.db)
 
@@ -249,7 +253,7 @@ class Prediction(QWidget):
         self.prediction_model.train_model()
         self.prediction_model.predict_and_store()
 
-        conn = VegetationDatabase().get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -310,5 +314,7 @@ class Prediction(QWidget):
         pixmap = QPixmap(save_path)
         self.lbl_prediction_image.setPixmap(pixmap.scaled(240, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
-        # Close the database connection
-        # conn.close()
+    def handle_chat(self):
+        prompt = txt_chat_entry.text()
+        print(f"Prompt: {prompt}")
+        self.gemini_assistant.generate_response(prompt)

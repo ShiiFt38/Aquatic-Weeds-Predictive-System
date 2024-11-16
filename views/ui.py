@@ -177,7 +177,7 @@ class Interface():
         btn_predictions = self.create_secondary_btn("Predictions")
         btn_reports = self.create_secondary_btn("Reports")
         btn_data = self.create_secondary_btn("Data Management")
-        btn_help = self.create_secondary_btn("Help and Support")
+        # btn_help = self.create_secondary_btn("Help and Support")
         btn_about = self.create_secondary_btn("About")
 
         user_avatar = QLabel()
@@ -189,7 +189,7 @@ class Interface():
         sidebar_layout.addWidget(btn_predictions)
         sidebar_layout.addWidget(btn_reports)
         sidebar_layout.addWidget(btn_data)
-        sidebar_layout.addWidget(btn_help)
+        # sidebar_layout.addWidget(btn_help)
         sidebar_layout.addWidget(btn_about)
         sidebar_layout.addStretch()
 
@@ -207,7 +207,7 @@ class Interface():
         btn_predictions.clicked.connect(lambda: self.stack.setCurrentIndex(2))
         btn_reports.clicked.connect(lambda: self.stack.setCurrentIndex(3))
         btn_data.clicked.connect(lambda: self.stack.setCurrentIndex(4))
-        btn_help.clicked.connect(lambda: self.stack.setCurrentIndex(5))
+        # btn_help.clicked.connect(lambda: self.stack.setCurrentIndex(5))
         btn_about.clicked.connect(lambda: self.stack.setCurrentIndex(6))
 
         return sidebar_widget

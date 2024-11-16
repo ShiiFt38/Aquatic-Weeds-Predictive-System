@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine
-import sqlite3
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
@@ -8,8 +7,8 @@ from models.db import VegetationDatabase
 
 
 class PredictionModel:
-    def __init__(self):
-        self.db = VegetationDatabase()
+    def __init__(self, db):
+        self.db = db
         self.engine = create_engine('sqlite:///vegetation.db')
         self.model = DecisionTreeRegressor()
 
