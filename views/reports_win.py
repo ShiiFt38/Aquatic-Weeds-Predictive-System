@@ -104,8 +104,8 @@ class Report(QWidget):
 
         data = export_utility.export_vegetation_data(start_date, end_date)
 
-        print("Saving excel file")
         if "Excel" in report_type:
+            print("Saving excel file")
             file_path = QFileDialog.getSaveFileName(
                 self,
                 "Save Excel Report",
@@ -123,6 +123,7 @@ class Report(QWidget):
             exporter.save_to_excel(data, file_path)
 
         elif "CSV" in report_type:
+            print("Saving csv file")
             file_path = QFileDialog.getSaveFileName(
                 self,
                 "Save CSV Reports",
@@ -145,6 +146,7 @@ class Report(QWidget):
                 print(f"- {file}")
 
         elif "PDF" in report_type:
+            print("Saving pdf file")
             file_path = QFileDialog.getSaveFileName(
                 self,
                 "Save PDF Report",

@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QPalette, QBrush, QPainter
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PyQt5.QtGui import QIcon, QPixmap, QPalette, QBrush, QPainter
 from PyQt5.QtCore import Qt, pyqtSignal, QRect
 from views.ui import Interface
 
@@ -16,6 +16,9 @@ class Login(QWidget):
         # Objects
         btn_start = ui.create_primary_btn(("Get Started"))
         lbl_title = ui.create_title("Aquatic Weeds Predictive System")
+        lbl_welcome = QLabel("Welcome,")
+        lbl_intro = QLabel("")
+        lbl_intro.setText("Get creative insights and accurate forecasts <br>from a trained artificial intelligence model.")
         logo = QLabel()
         logo.setPixmap(QIcon("Assets/Images/Logo.png").pixmap(64, 64))
 
@@ -30,13 +33,33 @@ class Login(QWidget):
         main_layout.addWidget(lbl_title, alignment=Qt.AlignCenter)
         main_layout.addStretch()
 
-        form_layout.addWidget(btn_start)
+        form_layout.addWidget(lbl_welcome)
+        form_layout.addWidget(lbl_intro)
+        form_layout.addSpacing(20)
+        form_layout.addWidget(btn_start, alignment=Qt.AlignCenter)
         form_layout.addStretch()
         form_widget.setLayout(form_layout)
 
         main_layout.addWidget(form_widget, alignment=Qt.AlignCenter)
         main_layout.addStretch()
         self.setLayout(main_layout)
+
+        lbl_welcome.setStyleSheet("""
+        QLabel {color: #ffffff;
+                background: transparent;
+                font-size: 16px;
+                font-family: Helvetica;
+                font-weight: bold
+                }""")
+
+        lbl_intro.setStyleSheet("""
+        QLabel {color: #ffffff;
+                background: transparent;
+                line-height: 1.5;
+                font-size: 12px;
+                font-family: Helvetica;
+                font-weight: bold
+                }""")
 
         # Design
 
@@ -47,6 +70,8 @@ class Login(QWidget):
 
         form_widget.setStyleSheet("background-color: rgba(0, 0, 0, 128); border-radius: 10px;")
         form_widget.setContentsMargins(100, 60, 100, 60)
+
+
 
         # Functions
         btn_start.clicked.connect(lambda: self.stack.setCurrentIndex(1))

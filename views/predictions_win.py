@@ -1,9 +1,9 @@
 import cv2
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt, QFile
+from PyQt5.QtWidgets import (QWidget, QGroupBox, QLineEdit, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QScrollArea,
+                             QStackedLayout, QFileDialog)
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
 import os
-from models.db import VegetationDatabase
 from views.ui import Interface
 from controllers.image_processor import ImageProcessor
 from controllers.weather_handler import WeatherHandler

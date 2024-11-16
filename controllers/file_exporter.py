@@ -1,8 +1,5 @@
 import pandas as pd
 import os
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-import sqlite3
 from models.db_export_utility import ExportUtility
 
 

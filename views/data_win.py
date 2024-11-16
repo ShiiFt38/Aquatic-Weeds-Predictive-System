@@ -1,7 +1,8 @@
 # TODO: Add a QMessage to notify users that their report is saved successfully
 import sqlite3
 from PyQt5.QtCore import QDate
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, QScrollArea, QGroupBox, QDateEdit, QFileDialog,
+                             QMessageBox)
 from views.ui import Interface
 from controllers.satellite_imagery import Satellite
 from controllers.downloader import DownloadThread

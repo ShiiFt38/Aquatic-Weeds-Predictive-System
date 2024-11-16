@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QScrollArea
 from views.ui import Interface
 
 class Settings():
@@ -13,8 +13,6 @@ class Settings():
         header = ui.create_header()
 
         lbl_title = QLabel("Settings")
-
-        earth_config_section = QGroupBox("EarthEngine Configuration")
 
         # Layout
         content_widget = QWidget()

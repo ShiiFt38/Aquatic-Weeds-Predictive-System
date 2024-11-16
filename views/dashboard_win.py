@@ -1,6 +1,6 @@
 import sqlite3
-
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTableWidget, QHeaderView, QVBoxLayout, QHBoxLayout, QLabel,
+                             QScrollArea, QGroupBox, QMessageBox)
 from PyQt5.QtCore import Qt
 from views.ui import Interface
 

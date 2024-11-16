@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 from views.ui import Interface
 from PyQt5.QtCore import Qt
 
@@ -10,7 +10,7 @@ class About(QWidget):
         ui = Interface(self.stack)
 
         lbl_awps = ui.create_title("Aquatic Weeds Predictive System")
-        lbl_version = QLabel("Version 1.0.1")
+        lbl_version = QLabel("Version 1.1.2")
         btn_close = ui.create_primary_btn("Close")
 
         #Layout

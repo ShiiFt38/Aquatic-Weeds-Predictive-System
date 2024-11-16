@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QGroupBox, QWidget
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
 
@@ -22,7 +22,8 @@ class Interface():
                                     }""",
             "secondary_btn": """QPushButton {
                                     color: #ffffff; 
-                                    font-size: 12px; 
+                                    font-size: 12px;
+                                    font-family: Helvetica; 
                                     font-weight: bold;
                                     border-radius: 10px;
                                     }
@@ -35,6 +36,7 @@ class Interface():
                                             background-color: #000000;
                                             color: #ffffff; 
                                             font-size: 12px; 
+                                            font-family: Helvetica;
                                             font-weight: bold;
                                             border-radius: 10px;
                                             }
@@ -44,11 +46,13 @@ class Interface():
                                             color: #000000;
                                             }""",
             "title_style": """ QLabel {
-                                    font-size: 24px; 
+                                    font-size: 24px;
+                                    font-family: Helvetica; 
                                     font-weight: bold; 
                                     }""",
             "heading_style": """ QLabel {
-                                    font-size: 12px; 
+                                    font-size: 12px;
+                                    font-family: Helvetica; 
                                     font-weight: bold; 
                                     }""",
             "section_style": """
@@ -221,16 +225,16 @@ class Interface():
 
         header_layout = QHBoxLayout(header_widget)
 
-        btn_settings = self.create_primary_btn("Settings")
+        # btn_settings = self.create_primary_btn("Settings")
         btn_logout = self.create_primary_btn("Exit")
 
         header_layout.addSpacing(50)
         header_layout.addWidget(lbl_name)
         header_layout.addStretch()
-        header_layout.addWidget(btn_settings)
+        # header_layout.addWidget(btn_settings)
         header_layout.addWidget(btn_logout)
 
-        btn_settings.clicked.connect(lambda: self.stack.setCurrentIndex(7))
+        # btn_settings.clicked.connect(lambda: self.stack.setCurrentIndex(7))
         btn_logout.clicked.connect(lambda: self.stack.setCurrentIndex(0))
 
         return header_widget

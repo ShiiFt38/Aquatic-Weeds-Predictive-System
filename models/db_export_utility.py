@@ -1,12 +1,11 @@
-from sqlalchemy import create_engine, text
+# TODO: Amend the PDF export functionality
+from sqlalchemy import create_engine
 import pandas as pd
 import os
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+import matplotlib.pyplot as plt
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from datetime import datetime
+from models.custom_pdf import CustomPDF
 
 class ExportUtility():
     def __init__(self, db):
@@ -39,82 +38,54 @@ class ExportUtility():
             spaceAfter=20
         )
 
+    def generate_visualization(self, df, output_path):
+        # Example: Create a bar chart of vegetation types
+        if 'vegetation_type' not in df.columns:
+            print("The 'vegetation_type' column is missing in the DataFrame.")
+            return
+        summary = df['vegetation_type'].value_counts()
+        summary.plot(kind='bar', color='green')
+        plt.title('Vegetation Type Distribution')
+        plt.xlabel('Type')
+        plt.ylabel('Count')
+        plt.savefig(output_path)
+        plt.close()
+
     def create_pdf_report(self, data_dict, file_path, logo_path, start_date, end_date):
-        """
-        Create a PDF report with logo and formatted data tables.
+        pdf = CustomPDF()
+        pdf.logo_path = logo_path  # Assign logo path for the header
+        pdf.add_page()
 
-        Parameters:
-        data_dict (dict): Dictionary of DataFrames
-        file_path (str): Output PDF file path
-        logo_path (str): Path to logo image
-        start_date (str): Start date of the report period
-        end_date (str): End date of the report period
-        """
-        doc = SimpleDocTemplate(
-            file_path,
-            pagesize=landscape(letter),
-            rightMargin=50,
-            leftMargin=50,
-            topMargin=50,
-            bottomMargin=50
-        )
+        # Add introduction
+        pdf.set_font('Arial', size=12)
+        pdf.multi_cell(0, 10, f"This report covers the period from {start_date} to {end_date}.")
+        pdf.ln(10)
 
-        # Store all elements that will go into the PDF
-        elements = []
-
-        # Add logo
-        logo = Image(logo_path, width=2 * inch, height=2 * inch)
-        logo.hAlign = 'CENTER'
-        elements.append(logo)
-        elements.append(Spacer(1, 20))
-
-        # Add title
-        elements.append(Paragraph("Aquatic Weeds Predictive System", self.title_style))
-
-        # Add date range
-        date_text = f"Report Period: {start_date} to {end_date}"
-        elements.append(Paragraph(date_text, self.date_style))
-        elements.append(Spacer(1, 20))
-
-        # Process each DataFrame
+        # Loop through DataFrames
         for table_name, df in data_dict.items():
-            # Add section header
-            section_title = table_name.replace('_', ' ').title()
-            elements.append(Paragraph(section_title, self.section_style))
+            # Add section title
+            pdf.set_font('Arial', 'B', 14)
+            pdf.cell(0, 10, table_name.replace('_', ' ').title(), ln=True)
+            pdf.ln(5)
 
-            # Convert DataFrame to list of lists for ReportLab
-            data = [df.columns.tolist()] + df.values.tolist()
+            # Generate a summary chart and add it to the PDF
+            chart_path = f"{table_name}_chart.png"
+            self.generate_visualization(df, chart_path)
+            if os.path.exists(chart_path):
+                pdf.image(chart_path, x=10, y=pdf.get_y(), w=170)
+                pdf.ln(70)  # Adjust spacing as needed
+                os.remove(chart_path)
 
-            # Create table
-            table = Table(data, repeatRows=1)
+            # Add summarized data or insights (if applicable)
+            if not df.empty:
+                pdf.set_font('Arial', size=10)
+                summary = df.describe(include='all').transpose()
+                summary_text = summary.to_string()
+                pdf.multi_cell(0, 10, f"Summary:\n{summary_text}")
+            pdf.ln(10)
 
-            # Style the table
-            table_style = TableStyle([
-                # Header style
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2E5090')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                # Data rows
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                # Alternating row colors
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F0F0F0')])
-            ])
-            table.setStyle(table_style)
-
-            # Add table to elements
-            elements.append(table)
-            elements.append(Spacer(1, 30))
-
-        # Build PDF
-        doc.build(elements)
+        # Output the PDF
+        pdf.output(file_path)
 
     def export_vegetation_data(self, start_date, end_date):
         """
