@@ -9,3 +9,7 @@ numpy~=2.1.1
 requests~=2.32.3
 SQLAlchemy~=2.0.36
 scikit-learn~=1.5.2
+fpdf~=1.7.2
+matplotlib~=3.9.2
+protobuf~=5.28.2
+tenacity~=9.0.0

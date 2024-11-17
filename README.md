@@ -45,6 +45,11 @@ python app.py
   - `image_processor.py`: Handles image processing tasks
   - `downloader.py`: Manages data downloading
   - `satellite_imagery.py`: Interacts with Google Earth Engine (requires .env file)
+  - `image_processor.py`: Handles image processing tasks
+  - `downloader.py`: Manages data downloading, including weather and satellite data
+  - `satellite_imagery.py`: Interacts with Google Earth Engine (requires .env file)
+  - `centroid_predictor.py`: Implements a decision tree machine learning model to predict vegetation centroid locations based on input features and historical data
+  - `weather_handler.py`: Retrieves and processes weather data from APIs, managing the integration of historical and real-time weather information
 - `views/`: Contains frontend UI components
   - `dashboard_win.py`: Dashboard window
   - `data_win.py`: Data visualization window
@@ -52,6 +57,14 @@ python app.py
   - `reports_win.py`: Reports generation window
   - `ui.py`: Main UI components
   - `settings_dialog.py`: Settings management
+  - `loading_screen.py`: Displays a visually engaging loading screen during backend operations like data fetching and processing
+- `models/` : Database utilities
+  - `db.py`: Database creation and CRUD functions
+  - `db_export_utility`: Dedicated file exporting module
+- `utilities/` 
+  - `file_exporter.py`: Exports processed data and results in formats like CSV and PDF
+  - `gemini_assistant.py`: AI-driven assistant to provide insights about uploaded images, with a focus on vegetation detection
+  - `custom_pdf.py`: Generates professional PDF reports summarizing vegetation predictions, weather insights, and centroid forecasts
 
 ## Contributing
 

@@ -20,7 +20,7 @@ class LoadingScreen(QWidget):
         self.label_animation.setMovie(self.movie)
 
         # Loading text
-        self.label_text = QLabel("Loading AWPS...")
+        self.label_text = QLabel("AWPS Loading...")
         self.label_text.setAlignment(Qt.AlignCenter)
         self.label_text.setStyleSheet("""
             QLabel {

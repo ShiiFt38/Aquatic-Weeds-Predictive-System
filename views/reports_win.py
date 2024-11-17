@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import *
 from views.ui import Interface
-from controllers.file_exporter import ExportReports
+from utilities.file_exporter import ExportReports
 from models.db_export_utility import ExportUtility
 
 class Report(QWidget):

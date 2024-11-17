@@ -18,7 +18,7 @@ class Login(QWidget):
         lbl_title = ui.create_title("Aquatic Weeds Predictive System")
         lbl_welcome = QLabel("Welcome,")
         lbl_intro = QLabel("")
-        lbl_intro.setText("Get creative insights and accurate forecasts <br>from a trained artificial intelligence model.")
+        lbl_intro.setText("<br>Get creative insights and accurate forecasts <br><br>from a trained artificial intelligence model.")
         logo = QLabel()
         logo.setPixmap(QIcon("Assets/Images/Logo.png").pixmap(64, 64))
 
@@ -35,7 +35,7 @@ class Login(QWidget):
 
         form_layout.addWidget(lbl_welcome)
         form_layout.addWidget(lbl_intro)
-        form_layout.addSpacing(20)
+        form_layout.addSpacing(40)
         form_layout.addWidget(btn_start, alignment=Qt.AlignCenter)
         form_layout.addStretch()
         form_widget.setLayout(form_layout)
@@ -55,7 +55,6 @@ class Login(QWidget):
         lbl_intro.setStyleSheet("""
         QLabel {color: #ffffff;
                 background: transparent;
-                line-height: 1.5;
                 font-size: 12px;
                 font-family: Helvetica;
                 font-weight: bold
